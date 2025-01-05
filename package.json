@@ -7,17 +7,21 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "pm2 start ./node_modules/.bin/vite --name Codive-Sales-Admin -- preview",
+    "stop": "pm2 stop Codive-Sales-Admin",
+    "restart": "npm run stop && npm run start"
   },
   "dependencies": {
+    "clsx": "^2.1.0",
+    "date-fns": "^3.3.1",
     "lucide-react": "^0.344.0",
+    "pm2": "^5.4.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.51.0",
     "react-router-dom": "^6.22.3",
-    "recharts": "^2.12.2",
-    "date-fns": "^3.3.1",
-    "clsx": "^2.1.0",
-    "react-hook-form": "^7.51.0"
+    "recharts": "^2.12.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",

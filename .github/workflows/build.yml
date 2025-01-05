@@ -1,0 +1,46 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - PROD
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '23'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Get latest commit message
+        id: get_commit
+        run: echo "COMMIT_MSG=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+
+      - name: Push built files
+        if: env.COMMIT_MSG != 'Build Workflow'
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
+        run: |
+          git config user.email "codivetech@gmail.com"
+          git config user.name "codive-tech"
+          git add -f dist
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Build Workflow"
+            git push "https://${{ secrets.TOKEN }}@github.com/codive-tech/codive_sales_admin.git" HEAD:PROD
+          fi
