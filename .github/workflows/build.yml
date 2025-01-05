@@ -42,5 +42,5 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "Build Workflow"
-            git push "https://${{ secrets.TOKEN }}@github.com/codive-tech/codive_sales_admin.git" HEAD:PROD
+            git push "https://${{ secrets.TOKEN }}@github.com/codive-tech/codive_sales_admin.git" HEAD:main
           fi
