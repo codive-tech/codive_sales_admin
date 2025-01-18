@@ -1,12 +1,12 @@
 // Update the existing SchoolForm.tsx to include admin settings
 import React, {useEffect, useState} from 'react';
 import { useForm } from 'react-hook-form';
-import type { School } from '../../types';
 import {X} from "lucide-react";
+import {Course, SchoolData} from "../../types/school";
 
 interface SchoolFormProps {
-  school?: School;
-  onSubmit: (data: Partial<School>) => void;
+  school?: SchoolData;
+  onSubmit: (data: Partial<SchoolData>) => void;
   onCancel: () => void;
 }
 
@@ -17,9 +17,12 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
       principalName: '',
       contactEmail: '',
       contactPhone: '',
-      address: '',
+      address: {
+        state: '',
+        country: '',
+        pincode: ''},
       status: 'active',
-      agreementEndDate: new Date().toISOString().split('T')[0],
+      course: []
     },
   });
   const grades = [
@@ -36,7 +39,9 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
   ];
   const classes = [50, 80, 100];
   const alphabet = Array.from({ length: 10 }, (_, i) => String.fromCharCode(65 + i));
-  const [selectedClasses, setSelectedClasses] = useState([]);
+
+  // combination of selected classes
+  const [selectedClasses, setSelectedClasses]: Course = useState([]);
   const initialSelection = {
     grade: grades[0],
     section: alphabet[0],
@@ -44,10 +49,7 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
     code: `${grades[0]} - ${alphabet[0]} - ${classes[0]} classes`
   }
   const [gradeSelection, setGradeSelections] = useState(initialSelection);
-  useEffect(()=> {
-    console.log(selectedClasses)
 
-  }, [selectedClasses])
   const handleAddClass = () => {
     const gradeCode = `${gradeSelection.grade} - ${gradeSelection.section} - ${gradeSelection.classCount} classes`;
     const isPresent = selectedClasses.find(gd => gd.code === gradeCode);
@@ -64,8 +66,22 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
     const isPresent = selectedClasses.filter((gd, i) => gd.code !== grade.code);
     setSelectedClasses(isPresent)
   }
+
+  const addSchool = (data: SchoolData) => {
+    data.course = selectedClasses;
+    data.address = {
+      state: 'string',
+      country: 'string',
+      pincode: 'string',
+    };
+
+    data.contactPerson = data.principalName;
+    data.schoolCode = data.name;
+    onSubmit(data);
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(addSchool)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Existing fields */}
         <div>
@@ -129,7 +145,7 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700">Address</label>
           <textarea
-            {...register('address')}
+            {...register('address.country')}
             rows={3}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
@@ -176,7 +192,7 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
               )}
             </select>
           </div>
-          <div  className={'flex-1 justify-items-end content-center flex justify-end items-end'}>
+          <div className={'flex-1 justify-items-end content-center flex justify-end items-end'}>
             <button
                 type="button"
                 onClick={handleAddClass}

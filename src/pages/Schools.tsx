@@ -4,7 +4,8 @@ import { SchoolList } from '../components/schools/SchoolList';
 import { SchoolForm } from '../components/schools/SchoolForm';
 import { DataFilter } from '../components/filters/DataFilter';
 import { filterData } from '../utils/filters';
-import type { School } from '../types';
+import {SchoolData} from "../types/school";
+import apiClient from "../config/axios";
 
 const filterOptions = [
   { label: 'All Schools', value: 'all' },
@@ -16,7 +17,7 @@ const filterOptions = [
 export function Schools() {
   const { schools, addSchool, updateSchool } = useSchools();
   const [showForm, setShowForm] = useState(false);
-  const [selectedSchool, setSelectedSchool] = useState<School | undefined>();
+  const [selectedSchool, setSelectedSchool] = useState<SchoolData | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -27,18 +28,21 @@ export function Schools() {
     ['name', 'principalName', 'contactEmail']
   ).filter((school) => statusFilter === 'all' || school.status === statusFilter);
 
-  const handleSubmit = (data: Partial<School>) => {
+  const handleSubmit = (data: Partial<SchoolData>) => {
+    console.log(data)
     if (selectedSchool) {
       updateSchool(selectedSchool.id, data);
     } else {
-      const newSchool: School = {
+      const newSchool: SchoolData = {
         id: crypto.randomUUID(),
         status: 'active',
         enrollmentDate: new Date().toISOString(),
         agreementEndDate: data.agreementEndDate || new Date().toISOString(),
         coursesEnrolled: [],
-        ...data as Omit<School, 'id' | 'enrollmentDate' | 'coursesEnrolled'>
+        ...data as Omit<SchoolData, 'id' | 'enrollmentDate' | 'coursesEnrolled'>
       };
+      const url = `${import.meta.env.VITE_API_URL}/school`;
+      apiClient.post(url, data)
       addSchool(newSchool);
     }
     
@@ -46,7 +50,7 @@ export function Schools() {
     setSelectedSchool(undefined);
   };
 
-  const handleEdit = (school: School) => {
+  const handleEdit = (school: SchoolData) => {
     setSelectedSchool(school);
     setShowForm(true);
   };

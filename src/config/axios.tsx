@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 // Create Axios instance
 const apiClient = axios.create({
-    baseURL: 'https://example.com/api', // Your API base URL
+    baseURL: 'https://api.codive.co', // Your API base URL
 });
 
 // Add request interceptor to attach the token to every request
