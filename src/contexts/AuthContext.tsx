@@ -1,11 +1,30 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiClient from "../config/axios";
+interface Address {
+  state: string;
+  country: string;
+  pincode: string;
+}
+
+interface AssignedCourse {
+  courseId: string; // ObjectId
+  joinedDate: string; // ISO date string
+  canceledDate?: string | null; // Optional ISO date string
+}
 
 interface User {
-  id: string;
-  email: string;
   name: string;
-  role: 'admin' | 'manager';
+  email: string;
+  phoneNo: string;
+  role: "student_school" | "student_outside" | "teacher" | "sales_person" | "school_admin" | "main_admin";
+  school: string; // ObjectId
+  studentId?: string; // Optional, for roles other than students
+  assignedCourses: AssignedCourse[];
+  password: string; // Write-only
+  backupPassword?: string; // Optional write-only
+  grade?: number; // Optional, for roles that require grade
+  address: Address;
 }
 
 interface LoginData {
@@ -63,8 +82,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     localStorage.removeItem('loginTime');
     navigate('/login');
+  };
+
+  const userData = async () => {
+    const url = `${import.meta.env.VITE_API_URL}/users`
+    const userDetails = await apiClient.get(url);
+
+    if (userDetails.status !== 200 || userDetails.data.role !== 'sales_person') {
+      throw new Error('InValid user')
+    }
+    setUser(userDetails.data);
+    localStorage.setItem('user', JSON.stringify(userDetails.data));
+    navigate('/');
   };
 
   const login = async ({ email, password }: LoginData) => {
@@ -75,16 +107,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Accept any valid email/password combination
       if (email && password) {
-        const user: User = {
-          id: crypto.randomUUID(),
-          email,
-          name: email.split('@')[0],
-          role: 'admin'
-        };
-        setUser(user);
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('loginTime', Date.now().toString());
-        navigate('/');
+        const url = `${import.meta.env.VITE_API_URL}/sessions`
+        const body = {
+          email: email,
+          password: password
+        }
+        apiClient.post(url, body).then(res => {
+          localStorage.setItem('token', res.data);
+          localStorage.setItem('loginTime', Date.now().toString());
+          userData()
+        }).catch(error => {
+          throw new Error(error)
+        })
       } else {
         throw new Error('Email and password are required');
       }
