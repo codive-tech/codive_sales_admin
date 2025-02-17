@@ -24,19 +24,19 @@ export function SchoolList({ schools, onEdit }: SchoolListProps) {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {schools.map((school) => (
-              <tr key={school.id} className="hover:bg-gray-50">
+              <tr key={school?.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{school.name}</div>
-                    <div className="text-sm text-gray-500">{school.contactEmail}</div>
+                    <div className="text-sm font-medium text-gray-900">{school?.name}</div>
+                    <div className="text-sm text-gray-500">{school?.contactEmail}</div>
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <Badge variant={school.status}>{school.status}</Badge>
+                  <Badge variant={school?.status}>{school?.status}</Badge>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-500">{school.principalName}</td>
+                <td className="px-6 py-4 text-sm text-gray-500">{school?.principalName}</td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {format(new Date(school.enrollmentDate), 'MMM d, yyyy')}
+                  {format(new Date(), 'MMM d, yyyy')}
                 </td>
                 <td className="px-6 py-4">
                   <button

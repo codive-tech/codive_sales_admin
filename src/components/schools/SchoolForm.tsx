@@ -14,7 +14,8 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
   const { register, handleSubmit } = useForm({
     defaultValues: school || {
       name: '',
-      principalName: '',
+      contactPerson: '',
+      contactPersonRole: '',
       contactEmail: '',
       contactPhone: '',
       address: {
@@ -22,7 +23,8 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
         country: '',
         pincode: ''},
       status: 'active',
-      course: []
+      course: [],
+      section: []
     },
   });
   const grades = [
@@ -54,12 +56,13 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
     const gradeCode = `${gradeSelection.grade} - ${gradeSelection.section} - ${gradeSelection.classCount} classes`;
     const isPresent = selectedClasses.find(gd => gd.code === gradeCode);
     if (!isPresent) {
-      setSelectedClasses([...selectedClasses, {...gradeSelection, code: gradeCode}])
+      setSelectedClasses([...selectedClasses, {...gradeSelection, sectionCode: gradeCode, courseName: 'abc', courseCode: 'abc'}])
     }
   }
 
   const handleGradeSelection = (field) => {
-    setGradeSelections({...gradeSelection, [field.target.id]: field.target.value})
+    const value = field?.target?.id === 'classCount' ? parseInt(field.target.value): field.target.value;
+    setGradeSelections({...gradeSelection, [field.target.id]: value})
   }
 
   const handleGradeRemove = (grade) => {
@@ -75,7 +78,7 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
       pincode: 'string',
     };
 
-    data.contactPerson = data.principalName;
+    data.contactPerson = data.contactPerson;
     data.schoolCode = data.name;
     onSubmit(data);
   }
@@ -94,10 +97,18 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700">Principal Name</label>
+          <label className="block text-sm font-medium text-gray-700">Contact Person</label>
           <input
             type="text"
-            {...register('principalName')}
+            {...register('contactPerson')}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Contact Person Role</label>
+          <input
+            type="text"
+            {...register('contactPersonRole')}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
@@ -112,7 +123,7 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Phone</label>
+          <label className="block text-sm font-medium text-gray-700">Contact Person Phone</label>
           <input
             type="tel"
             {...register('contactPhone')}
@@ -121,17 +132,17 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
         </div>
 
         {/* New admin fields */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Initial Status</label>
-          <select
-            {...register('status')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
-          </select>
-        </div>
+        {/*<div>*/}
+        {/*  <label className="block text-sm font-medium text-gray-700">Initial Status</label>*/}
+        {/*  <select*/}
+        {/*    {...register('status')}*/}
+        {/*    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"*/}
+        {/*  >*/}
+        {/*    <option value="active">Active</option>*/}
+        {/*    <option value="inactive">Inactive</option>*/}
+        {/*    <option value="suspended">Suspended</option>*/}
+        {/*  </select>*/}
+        {/*</div>*/}
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Agreement End Date</label>
@@ -206,7 +217,7 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
             className={"md:col-span-2 p-5 bg-[#f0f0f0] rounded-[10px] grid grid-cols-[repeat(auto-fit,_minmax(210px,_1fr))] gap-4"}>
           {selectedClasses.map(classes=> <>
             <div className={'bg-[#a4b3e3] p-5 rounded-lg text-center'}>
-              {classes.code}
+              {classes.sectionCode}
               <X className={'float-right'} onClick={() => handleGradeRemove(classes)} />
             </div>
           </>)}

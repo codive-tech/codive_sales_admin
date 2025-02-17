@@ -6,6 +6,8 @@ import { DataFilter } from '../components/filters/DataFilter';
 import { filterData } from '../utils/filters';
 import {SchoolData} from "../types/school";
 import apiClient from "../config/axios";
+import {useAuth} from "../contexts/AuthContext";
+import {toast} from "react-toastify";
 
 const filterOptions = [
   { label: 'All Schools', value: 'all' },
@@ -20,34 +22,44 @@ export function Schools() {
   const [selectedSchool, setSelectedSchool] = useState<SchoolData | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-
+  const { user } = useAuth();
   const filteredSchools = filterData(
     schools,
     searchQuery,
     'name',
     ['name', 'principalName', 'contactEmail']
-  ).filter((school) => statusFilter === 'all' || school.status === statusFilter);
+  ).filter((school) => statusFilter === 'all' || school?.status === statusFilter);
 
   const handleSubmit = (data: Partial<SchoolData>) => {
-    console.log(data)
     if (selectedSchool) {
-      updateSchool(selectedSchool.id, data);
+      updateSchool(selectedSchool?.id, data);
     } else {
-      const newSchool: SchoolData = {
-        id: crypto.randomUUID(),
-        status: 'active',
-        enrollmentDate: new Date().toISOString(),
-        agreementEndDate: data.agreementEndDate || new Date().toISOString(),
-        coursesEnrolled: [],
-        ...data as Omit<SchoolData, 'id' | 'enrollmentDate' | 'coursesEnrolled'>
-      };
-      const url = `${import.meta.env.VITE_API_URL}/school`;
-      apiClient.post(url, data)
-      addSchool(newSchool);
+      try {
+        const newSchool: SchoolData = {
+          status: 'active',
+          ...data as Omit<SchoolData, 'id' | 'enrollmentDate' | 'coursesEnrolled'>
+        };
+        data.section = data?.course;
+        data.salesPersonId = user?.data?._id;
+        const url = `${import.meta.env.VITE_API_URL}/school`;
+        apiClient.post(url, data).then(res => {
+          toast.success('School Added.');
+          setShowForm(false);
+          setSelectedSchool(undefined);
+          addSchool(newSchool);
+        }).catch(e => {
+              toast.warn('OOPS! Something went wrong.');
+              console.log(e)
+            }
+        )
+
+      } catch (e) {
+        console.log(e)
+      }
+
     }
     
-    setShowForm(false);
-    setSelectedSchool(undefined);
+
   };
 
   const handleEdit = (school: SchoolData) => {

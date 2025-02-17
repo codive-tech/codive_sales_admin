@@ -26,19 +26,26 @@ interface Address {
 }
 
 interface ClassTiming {
-  proposedTime: string;  // ISO 8601 date string
-  days: string[];
-  time: string;
+  timezone: string;  // ISO 8601 date string
+  isAdminProposed:  Record<string, [string[]]>;  // ISO 8601 date string
+  adminProposedTime:  Record<string, [string[]]>;  // ISO 8601 date string
+  proposedTime:  Record<string, [string[]]>;  // ISO 8601 date string
+  acceptedTime: string;  // ISO 8601 date string
+  startDate: string[];
+  endDate: string;
+  comment: string;
 }
 
 export interface Course {
+  status?: string;
   grade: string;
   section: string;
   classCount: number;
-  code: string;
+  courseName?: string;
+  sectionCode?: string;
   courseCode?: string;
   classTiming?: ClassTiming;
-  zoomlink?: string;
+  zoomLink?: string;
 }
 
 interface StudentGrowth {
@@ -51,6 +58,7 @@ export interface SchoolData {
   contactPerson?: string;
   contactEmail: string;
   contactPhone: string;
+  contactPersonRole: string;
   address?: Address;
   principalName?: string;
   schoolCode?: string;
@@ -58,6 +66,6 @@ export interface SchoolData {
   lastEdited?: string;  // ISO 8601 date string
   status?: string;
   studentGrowth?: StudentGrowth;
-  course?: Course[];
+  section?: Course[];
   salesPersonId?: string;
 }

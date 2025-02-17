@@ -17,7 +17,7 @@ interface User {
   name: string;
   email: string;
   phoneNo: string;
-  role: "student_school" | "student_outside" | "teacher" | "sales_person" | "school_admin" | "main_admin";
+  role: "school_student" | "direct_student" | "teacher" | "sales_person" | "school_admin" | "main_admin";
   school: string; // ObjectId
   studentId?: string; // Optional, for roles other than students
   assignedCourses: AssignedCourse[];
@@ -88,10 +88,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const userData = async () => {
-    const url = `${import.meta.env.VITE_API_URL}/users`
+    const url = `${import.meta.env.VITE_API_URL}/user`
     const userDetails = await apiClient.get(url);
-
-    if (userDetails.status !== 200 || userDetails.data.role !== 'sales_person') {
+    if (userDetails.status !== 200 || userDetails.data.data.role !== 'sales_person') {
       throw new Error('InValid user')
     }
     setUser(userDetails.data);
@@ -113,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           password: password
         }
         apiClient.post(url, body).then(res => {
-          localStorage.setItem('token', res.data);
+          localStorage.setItem('token', res.data.data.token);
           localStorage.setItem('loginTime', Date.now().toString());
           userData()
         }).catch(error => {

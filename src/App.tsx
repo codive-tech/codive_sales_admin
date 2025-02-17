@@ -10,7 +10,7 @@ import { Schools } from './pages/Schools';
 import { Sales } from './pages/Sales';
 import { Payments } from './pages/Payments';
 import Courses from './pages/Courses';
-
+import {ToastContainer} from "react-toastify";
 export default function App() {
   return (
     <BrowserRouter>
@@ -31,6 +31,7 @@ export default function App() {
             </Route>
           </Routes>
         </SchoolProvider>
+        <ToastContainer />
       </AuthProvider>
     </BrowserRouter>
   );

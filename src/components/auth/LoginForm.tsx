@@ -30,7 +30,7 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
       <div className="flex justify-center mb-8">
         <div className="flex items-center gap-2">
           <School className="h-8 w-8 text-indigo-600" />
-          <span className="text-2xl font-bold text-gray-900">Codive Admin</span>
+          <span className="text-2xl font-bold text-gray-900">Codive Sales Admin</span>
         </div>
       </div>
 
