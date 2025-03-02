@@ -68,4 +68,5 @@ export interface SchoolData {
   studentGrowth?: StudentGrowth;
   section?: Course[];
   salesPersonId?: string;
+  course?: string;
 }

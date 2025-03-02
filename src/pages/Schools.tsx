@@ -49,7 +49,6 @@ export function Schools() {
           addSchool(newSchool);
         }).catch(e => {
               toast.warn('OOPS! Something went wrong.');
-              console.log(e)
             }
         )
 

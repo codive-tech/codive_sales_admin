@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import { useForm } from 'react-hook-form';
 import {X} from "lucide-react";
 import {Course, SchoolData} from "../../types/school";
+import {toast} from "react-toastify";
 
 interface SchoolFormProps {
   school?: SchoolData;
@@ -57,6 +58,8 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
     const isPresent = selectedClasses.find(gd => gd.code === gradeCode);
     if (!isPresent) {
       setSelectedClasses([...selectedClasses, {...gradeSelection, sectionCode: gradeCode, courseName: 'abc', courseCode: 'abc'}])
+    } else {
+      toast.warn('This combination is already selected.')
     }
   }
 
@@ -66,7 +69,7 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
   }
 
   const handleGradeRemove = (grade) => {
-    const isPresent = selectedClasses.filter((gd, i) => gd.code !== grade.code);
+    const isPresent = selectedClasses.filter((gd, i) => gd.sectionCode !== grade.sectionCode);
     setSelectedClasses(isPresent)
   }
 

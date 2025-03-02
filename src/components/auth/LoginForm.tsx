@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { School, Lock } from 'lucide-react';
+import Icon from '../../../codive_logo.ico';
 
 interface LoginFormData {
   email: string;
@@ -27,9 +28,9 @@ export function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit(handleLogin)} className="space-y-6">
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-8 flex-col items-center">
+          <img src={Icon} alt={'Codive'} className={'w-16 mb-6'}/>
         <div className="flex items-center gap-2">
-          <School className="h-8 w-8 text-indigo-600" />
           <span className="text-2xl font-bold text-gray-900">Codive Sales Admin</span>
         </div>
       </div>
