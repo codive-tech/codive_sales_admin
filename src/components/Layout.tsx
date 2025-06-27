@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutGrid, School, TrendingUp, CreditCard, BookOpen, LogOut } from 'lucide-react';
+import { LayoutGrid, School, TrendingUp, CreditCard, BookOpen, LogOut, Users } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
   { icon: LayoutGrid, label: 'Dashboard', path: '/' },
   { icon: School, label: 'Schools', path: '/schools' },
+  { icon: Users, label: 'Students', path: '/students' },
   { icon: TrendingUp, label: 'Sales', path: '/sales' },
   { icon: CreditCard, label: 'Payments', path: '/payments' },
   { icon: BookOpen, label: 'Courses', path: '/courses' },

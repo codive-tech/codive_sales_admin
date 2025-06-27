@@ -57,7 +57,7 @@ export function SchoolForm({ school, onSubmit, onCancel }: SchoolFormProps) {
     const gradeCode = `${gradeSelection.grade} - ${gradeSelection.section} - ${gradeSelection.classCount} classes`;
     const isPresent = selectedClasses.find(gd => gd.code === gradeCode);
     if (!isPresent) {
-      setSelectedClasses([...selectedClasses, {...gradeSelection, sectionCode: gradeCode, courseName: 'abc', courseCode: 'abc'}])
+      setSelectedClasses([...selectedClasses, {...gradeSelection, sectionCode: gradeCode}])
     } else {
       toast.warn('This combination is already selected.')
     }

@@ -13,6 +13,10 @@
     "restart": "npm run stop && npm run start"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.1.2",
+    "@mui/system": "^7.1.1",
     "axios": "^1.7.9",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",

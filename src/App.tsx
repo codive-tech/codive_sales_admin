@@ -10,7 +10,9 @@ import { Schools } from './pages/Schools';
 import { Sales } from './pages/Sales';
 import { Payments } from './pages/Payments';
 import Courses from './pages/Courses';
+import Students from './pages/Students';
 import {ToastContainer} from "react-toastify";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -28,6 +30,7 @@ export default function App() {
               <Route path="/sales" element={<Sales />} />
               <Route path="/payments" element={<Payments />} />
               <Route path="/courses" element={<Courses />} />
+              <Route path="/students" element={<Students />} />
             </Route>
           </Routes>
         </SchoolProvider>
