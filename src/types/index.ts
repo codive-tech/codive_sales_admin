@@ -13,14 +13,19 @@ export interface Student {
   id: string;
   fullName: string;
   phoneNumber: string;
+  studentCountryCode: string;
   email: string;
   birthday: string;
   country: string;
   school: string;
   parentName: string;
   parentPhone: string;
+  parentCountryCode: string;
   parentEmail: string;
+  relation: string;
+  grade: string;
   secretPin: string;
+  classType: 'group' | 'one2one';
   createdAt: string;
   updatedAt: string;
 }
@@ -28,13 +33,18 @@ export interface Student {
 export interface CreateStudentData {
   fullName: string;
   phoneNumber: string;
+  studentCountryCode: string;
   email: string;
   birthday: string;
   country: string;
   school: string;
   parentName: string;
   parentPhone: string;
+  parentCountryCode: string;
   parentEmail: string;
+  relation: string;
   secretPin: string;
   confirmSecretPin: string;
+  grade: string;
+  classType: 'group' | 'one2one';
 }

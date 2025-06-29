@@ -21,7 +21,7 @@ export function Layout() {
       <nav className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 p-4">
         <div className="flex items-center gap-2 mb-8 px-2">
           <School className="h-8 w-8 text-indigo-600" />
-          <h1 className="text-xl font-bold text-gray-900">Codive Admin</h1>
+          <h1 className="text-xl font-bold text-gray-900">Codive Partner Dash</h1>
         </div>
         
         <div className="space-y-1">
