@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { CreateStudentData } from '../../types';
 import Input from '../../basic_components/Input';
+import CountrySelect from '../CountrySelect';
+import GradeSelect from '../GradeSelect';
+import RelationSelect from '../RelationSelect';
+import ClassTypeToggle from '../../basic_components/ClassTypeToggle';
 
 interface AddStudentModalProps {
   isOpen: boolean;
@@ -12,18 +16,23 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
   const [formData, setFormData] = useState<CreateStudentData>({
     fullName: '',
     phoneNumber: '',
+    studentCountryCode: '+1',
     email: '',
     birthday: '',
     country: '',
     school: '',
     parentName: '',
     parentPhone: '',
+    parentCountryCode: '+1',
     parentEmail: '',
+    relation: '',
     secretPin: '',
-    confirmSecretPin: ''
+    confirmSecretPin: '',
+    grade: '',
+    classType: 'group',
   });
 
-  const [errors, setErrors] = useState<Partial<CreateStudentData>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [studentCountryCode, setStudentCountryCode] = useState('+1');
   const [parentCountryCode, setParentCountryCode] = useState('+1');
 
@@ -31,12 +40,14 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
     }
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<CreateStudentData> = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
@@ -78,16 +89,12 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
       newErrors.parentEmail = 'Please enter a valid email';
     }
 
-    if (!formData.secretPin.trim()) {
-      newErrors.secretPin = 'Secret PIN is required';
-    } else if (formData.secretPin.length < 4) {
-      newErrors.secretPin = 'Secret PIN must be at least 4 characters';
+    if (!formData.relation.trim()) {
+      newErrors.relation = 'Relation to student is required';
     }
 
-    if (!formData.confirmSecretPin.trim()) {
-      newErrors.confirmSecretPin = 'Please confirm your secret PIN';
-    } else if (formData.secretPin !== formData.confirmSecretPin) {
-      newErrors.confirmSecretPin = 'Secret PINs do not match';
+    if (!formData.classType) {
+      newErrors.classType = 'Class type is required';
     }
 
     setErrors(newErrors);
@@ -98,11 +105,11 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
     e.preventDefault();
     
     if (validateForm()) {
-      // Add country codes to phone numbers
+      // Store country codes separately
       const dataWithCountryCodes = {
         ...formData,
-        phoneNumber: `${studentCountryCode}${formData.phoneNumber}`,
-        parentPhone: `${parentCountryCode}${formData.parentPhone}`
+        studentCountryCode: studentCountryCode,
+        parentCountryCode: parentCountryCode
       };
       
       onSubmit(dataWithCountryCodes);
@@ -110,15 +117,20 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
       setFormData({
         fullName: '',
         phoneNumber: '',
+        studentCountryCode: '+1',
         email: '',
         birthday: '',
         country: '',
         school: '',
         parentName: '',
         parentPhone: '',
+        parentCountryCode: '+1',
         parentEmail: '',
+        relation: '',
         secretPin: '',
-        confirmSecretPin: ''
+        confirmSecretPin: '',
+        grade: '',
+        classType: 'group',
       });
       setStudentCountryCode('+1');
       setParentCountryCode('+1');
@@ -133,6 +145,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">Add New Student</h2>
+          
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-2xl"
@@ -179,7 +192,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
             />
 
             <Input
-              label="Student Birthday"
+              label="Student Date of Birth"
               name="birthday"
               type="date"
               value={formData.birthday}
@@ -188,17 +201,15 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
               required
             />
 
-            <Input
-              label="Country"
-              name="country"
+            <CountrySelect
               value={formData.country}
-              onChange={(e) => handleInputChange('country', e.target.value)}
+              onChange={(value) => handleInputChange('country', value)}
               error={errors.country}
               required
             />
 
             <Input
-              label="School"
+              label="School Name"
               name="school"
               value={formData.school}
               onChange={(e) => handleInputChange('school', e.target.value)}
@@ -206,6 +217,18 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
               required
             />
 
+            <GradeSelect
+              value={formData.grade}
+              onChange={(value) => handleInputChange('grade', value)}
+              error={errors.grade}
+            />
+
+            <ClassTypeToggle
+              value={formData.classType}
+              onChange={(value) => handleInputChange('classType', value)}
+              error={errors.classType}
+              required
+            />
             {/* Parent/Guardian Information */}
             <div className="md:col-span-2">
               <h3 className="text-lg font-semibold text-gray-700 mb-3 mt-6">Parent/Guardian Information</h3>
@@ -222,7 +245,7 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
 
             <Input
               label="Parent/Guardian Phone Number"
-              name="parentPhoneNo"
+              name="phoneNo"
               value={formData.parentPhone}
               onChange={(e) => handleInputChange('parentPhone', e.target.value)}
               error={errors.parentPhone}
@@ -241,30 +264,13 @@ const AddStudentModal: React.FC<AddStudentModalProps> = ({ isOpen, onClose, onSu
               required
             />
 
-            {/* Security Information */}
-            <div className="md:col-span-2">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 mt-6">Security Information</h3>
-            </div>
-
-            <Input
-              label="Create Secret PIN"
-              name="secretPin"
-              type="password"
-              value={formData.secretPin}
-              onChange={(e) => handleInputChange('secretPin', e.target.value)}
-              error={errors.secretPin}
+            <RelationSelect
+              value={formData.relation}
+              onChange={(value) => handleInputChange('relation', value)}
+              error={errors.relation}
               required
             />
 
-            <Input
-              label="Confirm Secret PIN"
-              name="confirmSecretPin"
-              type="password"
-              value={formData.confirmSecretPin}
-              onChange={(e) => handleInputChange('confirmSecretPin', e.target.value)}
-              error={errors.confirmSecretPin}
-              required
-            />
           </div>
 
           <div className="flex justify-end space-x-3 pt-6">

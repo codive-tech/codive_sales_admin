@@ -11,7 +11,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const Input = forwardRef<HTMLInputElement, InputProps>(({ label, error, phoneNo = false, setCountryCode, ...props }, ref) => {
     return (
         <div>
-            <label className="mb-1 font-medium">{label}</label>
+            <label className="mb-1 font-medium">
+                {label}
+                {props.required && <span className="text-red-500 ml-1">*</span>}
+            </label>
             <div className={'flex items-end gap-2'}>
                 {props.name === "phoneNo" && (
                     <CountrySelect 

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Student, CreateStudentData } from '../../types';
 import Input from '../../basic_components/Input';
+import CountrySelect from '../CountrySelect';
+import GradeSelect from '../GradeSelect';
+import RelationSelect from '../RelationSelect';
+import ClassTypeToggle from '../../basic_components/ClassTypeToggle';
 
 interface EditStudentModalProps {
   isOpen: boolean;
@@ -13,18 +17,23 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
   const [formData, setFormData] = useState<CreateStudentData>({
     fullName: '',
     phoneNumber: '',
+    studentCountryCode: '+1',
     email: '',
     birthday: '',
     country: '',
     school: '',
     parentName: '',
     parentPhone: '',
+    parentCountryCode: '+1',
     parentEmail: '',
+    relation: '',
     secretPin: '',
-    confirmSecretPin: ''
+    confirmSecretPin: '',
+    grade: '',
+    classType: 'group',
   });
 
-  const [errors, setErrors] = useState<Partial<CreateStudentData>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [studentCountryCode, setStudentCountryCode] = useState('+1');
   const [parentCountryCode, setParentCountryCode] = useState('+1');
 
@@ -45,15 +54,20 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
       setFormData({
         fullName: student.fullName,
         phoneNumber: studentPhoneWithoutCode,
+        studentCountryCode: student.studentCountryCode,
         email: student.email,
         birthday: student.birthday,
         country: student.country,
         school: student.school,
         parentName: student.parentName,
         parentPhone: parentPhoneWithoutCode,
+        parentCountryCode: student.parentCountryCode,
         parentEmail: student.parentEmail,
+        relation: student.relation,
         secretPin: '****', // Don't show actual PIN for security
-        confirmSecretPin: '****'
+        confirmSecretPin: '****',
+        grade: student.grade,
+        classType: student.classType,
       });
     }
   }, [student]);
@@ -62,12 +76,14 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
     }
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<CreateStudentData> = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
@@ -109,6 +125,10 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
       newErrors.parentEmail = 'Please enter a valid email';
     }
 
+    if (!formData.classType) {
+      newErrors.classType = 'Class type is required';
+    }
+
     // Only validate PIN if user changed it
     if (formData.secretPin !== '****') {
       if (!formData.secretPin.trim()) {
@@ -135,8 +155,8 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
       // Add country codes to phone numbers
       const dataWithCountryCodes = {
         ...formData,
-        phoneNumber: `${studentCountryCode}${formData.phoneNumber}`,
-        parentPhone: `${parentCountryCode}${formData.parentPhone}`,
+        studentCountryCode: studentCountryCode,
+        parentCountryCode: parentCountryCode,
         // Keep original PIN if not changed
         secretPin: formData.secretPin === '****' ? (student?.secretPin || '') : formData.secretPin
       };
@@ -208,11 +228,9 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
               required
             />
 
-            <Input
-              label="Country"
-              name="country"
+            <CountrySelect
               value={formData.country}
-              onChange={(e) => handleInputChange('country', e.target.value)}
+              onChange={(value) => handleInputChange('country', value)}
               error={errors.country}
               required
             />
@@ -223,6 +241,19 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
               value={formData.school}
               onChange={(e) => handleInputChange('school', e.target.value)}
               error={errors.school}
+              required
+            />
+
+            <GradeSelect
+              value={formData.grade}
+              onChange={(value) => handleInputChange('grade', value)}
+              error={errors.grade}
+            />
+
+            <ClassTypeToggle
+              value={formData.classType}
+              onChange={(value) => handleInputChange('classType', value)}
+              error={errors.classType}
               required
             />
 
@@ -242,7 +273,7 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
 
             <Input
               label="Parent/Guardian Phone Number"
-              name="parentPhoneNo"
+              name="phoneNo"
               value={formData.parentPhone}
               onChange={(e) => handleInputChange('parentPhone', e.target.value)}
               error={errors.parentPhone}
@@ -261,30 +292,13 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, on
               required
             />
 
-            {/* Security Information */}
-            <div className="md:col-span-2">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 mt-6">Security Information</h3>
-            </div>
-
-            <Input
-              label="Secret PIN (leave as **** to keep current)"
-              name="secretPin"
-              type="password"
-              value={formData.secretPin}
-              onChange={(e) => handleInputChange('secretPin', e.target.value)}
-              error={errors.secretPin}
-              placeholder="Enter new PIN or leave as ****"
+            <RelationSelect
+              value={formData.relation}
+              onChange={(value) => handleInputChange('relation', value)}
+              error={errors.relation}
+              required
             />
 
-            <Input
-              label="Confirm Secret PIN"
-              name="confirmSecretPin"
-              type="password"
-              value={formData.confirmSecretPin}
-              onChange={(e) => handleInputChange('confirmSecretPin', e.target.value)}
-              error={errors.confirmSecretPin}
-              placeholder="Confirm new PIN"
-            />
           </div>
 
           <div className="flex justify-end space-x-3 pt-6">
