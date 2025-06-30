@@ -53,3 +53,477 @@ export const mockActivities = [
     schoolName: 'Mountain View School'
   }
 ];
+
+// Mock school data with comprehensive scenarios
+export const mockSchools = [
+  {
+    id: 'sch_1',
+    name: 'Springfield High School',
+    principalName: 'Dr. Sarah Johnson',
+    contactNumber: '+1-555-0123',
+    contactEmail: 'principal@springfield.edu',
+    country: 'United States',
+    city: 'Springfield',
+    course: 'AI Bootcamp',
+    status: 'active',
+    totalStudents: 1250,
+    enrollmentDate: '2024-01-15T00:00:00Z',
+    notes: 'Excellent engagement with AI program. Students showing great progress in machine learning projects.',
+    contactPersonRole: 'Principal',
+    schoolCode: 'SPR001',
+    creationDate: '2024-01-15T00:00:00Z',
+    lastEdited: '2024-03-10T14:30:00Z',
+    studentGrowth: { '2023': 1150, '2024': 1250 },
+    section: [
+      {
+        status: 'active',
+        grade: '9th Grade',
+        section: 'A',
+        classCount: 25,
+        courseName: 'AI Bootcamp',
+        sectionCode: 'AI9A',
+        courseCode: 'AI001',
+        zoomLink: 'https://zoom.us/j/123456789'
+      }
+    ]
+  },
+  {
+    id: 'sch_2',
+    name: 'Riverside Academy',
+    principalName: 'Mr. Michael Chen',
+    contactNumber: '+1-555-0456',
+    contactEmail: 'admin@riverside.edu',
+    country: 'United States',
+    city: 'Riverside',
+    course: 'Robotics 101',
+    status: 'active',
+    totalStudents: 850,
+    enrollmentDate: '2024-02-20T00:00:00Z',
+    notes: 'Strong robotics program implementation. Students participating in regional competitions.',
+    contactPersonRole: 'Administrator',
+    schoolCode: 'RIV002',
+    creationDate: '2024-02-20T00:00:00Z',
+    lastEdited: '2024-03-12T09:15:00Z',
+    studentGrowth: { '2023': 800, '2024': 850 },
+    section: [
+      {
+        status: 'active',
+        grade: '10th Grade',
+        section: 'B',
+        classCount: 30,
+        courseName: 'Robotics 101',
+        sectionCode: 'RB10B',
+        courseCode: 'RB001',
+        zoomLink: 'https://zoom.us/j/987654321'
+      }
+    ]
+  },
+  {
+    id: 'sch_3',
+    name: 'Mountain View School',
+    principalName: 'Ms. Emma Rodriguez',
+    contactNumber: '+1-555-0789',
+    contactEmail: 'contact@mountainview.edu',
+    country: 'United States',
+    city: 'Mountain View',
+    course: 'Coding Fundamentals',
+    status: 'suspended',
+    totalStudents: 650,
+    enrollmentDate: '2024-01-10T00:00:00Z',
+    notes: 'Access suspended due to payment issues. Contact made for resolution.',
+    contactPersonRole: 'Principal',
+    schoolCode: 'MTV003',
+    creationDate: '2024-01-10T00:00:00Z',
+    lastEdited: '2024-03-08T16:45:00Z',
+    studentGrowth: { '2023': 600, '2024': 650 },
+    section: [
+      {
+        status: 'suspended',
+        grade: '8th Grade',
+        section: 'C',
+        classCount: 20,
+        courseName: 'Coding Fundamentals',
+        sectionCode: 'CF8C',
+        courseCode: 'CF001',
+        zoomLink: 'https://zoom.us/j/456789123'
+      }
+    ]
+  },
+  {
+    id: 'sch_4',
+    name: 'Delhi Public School',
+    principalName: 'Dr. Rajesh Kumar',
+    contactNumber: '+91-98765-43210',
+    contactEmail: 'principal@dpsdelhi.edu.in',
+    country: 'India',
+    city: 'New Delhi',
+    course: 'Data Science',
+    status: 'active',
+    totalStudents: 2000,
+    enrollmentDate: '2024-03-01T00:00:00Z',
+    notes: 'Large school with excellent infrastructure. Students very enthusiastic about data science.',
+    contactPersonRole: 'Principal',
+    schoolCode: 'DPS004',
+    creationDate: '2024-03-01T00:00:00Z',
+    lastEdited: '2024-03-14T11:20:00Z',
+    studentGrowth: { '2023': 1800, '2024': 2000 },
+    section: [
+      {
+        status: 'active',
+        grade: '11th Grade',
+        section: 'A',
+        classCount: 35,
+        courseName: 'Data Science',
+        sectionCode: 'DS11A',
+        courseCode: 'DS001',
+        zoomLink: 'https://zoom.us/j/789123456'
+      }
+    ]
+  },
+  {
+    id: 'sch_5',
+    name: 'St. Mary\'s International School',
+    principalName: 'Sister Maria Theresa',
+    contactNumber: '+91-87654-32109',
+    contactEmail: 'admin@stmarys.edu.in',
+    country: 'India',
+    city: 'Mumbai',
+    course: 'Web Development',
+    status: 'active',
+    totalStudents: 1200,
+    enrollmentDate: '2024-02-15T00:00:00Z',
+    notes: 'Catholic school with strong emphasis on technology education. Great partnership potential.',
+    contactPersonRole: 'Administrator',
+    schoolCode: 'SMI005',
+    creationDate: '2024-02-15T00:00:00Z',
+    lastEdited: '2024-03-13T15:30:00Z',
+    studentGrowth: { '2023': 1100, '2024': 1200 },
+    section: [
+      {
+        status: 'active',
+        grade: '12th Grade',
+        section: 'B',
+        classCount: 28,
+        courseName: 'Web Development',
+        sectionCode: 'WD12B',
+        courseCode: 'WD001',
+        zoomLink: 'https://zoom.us/j/321654987'
+      }
+    ]
+  },
+  {
+    id: 'sch_6',
+    name: 'Cambridge International School',
+    principalName: 'Mr. David Wilson',
+    contactNumber: '+44-20-7123-4567',
+    contactEmail: 'principal@cambridgeint.edu.uk',
+    country: 'United Kingdom',
+    city: 'London',
+    course: 'Mobile App Development',
+    status: 'active',
+    totalStudents: 800,
+    enrollmentDate: '2024-01-25T00:00:00Z',
+    notes: 'International curriculum with focus on practical skills. Students creating innovative mobile apps.',
+    contactPersonRole: 'Principal',
+    schoolCode: 'CAM006',
+    creationDate: '2024-01-25T00:00:00Z',
+    lastEdited: '2024-03-11T10:45:00Z',
+    studentGrowth: { '2023': 750, '2024': 800 },
+    section: [
+      {
+        status: 'active',
+        grade: '10th Grade',
+        section: 'A',
+        classCount: 22,
+        courseName: 'Mobile App Development',
+        sectionCode: 'MAD10A',
+        courseCode: 'MAD001',
+        zoomLink: 'https://zoom.us/j/654321987'
+      }
+    ]
+  },
+  {
+    id: 'sch_7',
+    name: 'Toronto STEM Academy',
+    principalName: 'Dr. Jennifer Smith',
+    contactNumber: '+1-416-555-0123',
+    contactEmail: 'admin@torontostem.edu.ca',
+    country: 'Canada',
+    city: 'Toronto',
+    course: 'AI Bootcamp',
+    status: 'inactive',
+    totalStudents: 0,
+    enrollmentDate: '2024-02-28T00:00:00Z',
+    notes: 'School closed temporarily due to administrative changes. Contact maintained for future opportunities.',
+    contactPersonRole: 'Administrator',
+    schoolCode: 'TSA007',
+    creationDate: '2024-02-28T00:00:00Z',
+    lastEdited: '2024-03-09T13:20:00Z',
+    studentGrowth: { '2023': 0, '2024': 0 },
+    section: []
+  },
+  {
+    id: 'sch_8',
+    name: 'Sydney Tech High',
+    principalName: 'Ms. Lisa Thompson',
+    contactNumber: '+61-2-9123-4567',
+    contactEmail: 'principal@sydneytech.edu.au',
+    country: 'Australia',
+    city: 'Sydney',
+    course: 'Robotics 101',
+    status: 'active',
+    totalStudents: 950,
+    enrollmentDate: '2024-03-05T00:00:00Z',
+    notes: 'New partnership showing great promise. Students very engaged with robotics projects.',
+    contactPersonRole: 'Principal',
+    schoolCode: 'STH008',
+    creationDate: '2024-03-05T00:00:00Z',
+    lastEdited: '2024-03-15T08:30:00Z',
+    studentGrowth: { '2023': 0, '2024': 950 },
+    section: [
+      {
+        status: 'active',
+        grade: '9th Grade',
+        section: 'C',
+        classCount: 26,
+        courseName: 'Robotics 101',
+        sectionCode: 'RB9C',
+        courseCode: 'RB001',
+        zoomLink: 'https://zoom.us/j/147258369'
+      }
+    ]
+  },
+  {
+    id: 'sch_9',
+    name: 'Berlin Innovation School',
+    principalName: 'Herr Klaus Mueller',
+    contactNumber: '+49-30-1234-5678',
+    contactEmail: 'direktor@berlininnovation.edu.de',
+    country: 'Germany',
+    city: 'Berlin',
+    course: 'Data Science',
+    status: 'active',
+    totalStudents: 700,
+    enrollmentDate: '2024-02-10T00:00:00Z',
+    notes: 'German school with excellent technical infrastructure. Students very analytical and detail-oriented.',
+    contactPersonRole: 'Director',
+    schoolCode: 'BIS009',
+    creationDate: '2024-02-10T00:00:00Z',
+    lastEdited: '2024-03-12T14:15:00Z',
+    studentGrowth: { '2023': 650, '2024': 700 },
+    section: [
+      {
+        status: 'active',
+        grade: '11th Grade',
+        section: 'B',
+        classCount: 24,
+        courseName: 'Data Science',
+        sectionCode: 'DS11B',
+        courseCode: 'DS001',
+        zoomLink: 'https://zoom.us/j/963852741'
+      }
+    ]
+  },
+  {
+    id: 'sch_10',
+    name: 'Singapore Tech Institute',
+    principalName: 'Mr. Tan Wei Ming',
+    contactNumber: '+65-6123-4567',
+    contactEmail: 'principal@singaporetech.edu.sg',
+    country: 'Singapore',
+    city: 'Singapore',
+    course: 'Web Development',
+    status: 'active',
+    totalStudents: 1100,
+    enrollmentDate: '2024-01-20T00:00:00Z',
+    notes: 'High-performing school with excellent student outcomes. Strong focus on practical web development skills.',
+    contactPersonRole: 'Principal',
+    schoolCode: 'STI010',
+    creationDate: '2024-01-20T00:00:00Z',
+    lastEdited: '2024-03-14T16:45:00Z',
+    studentGrowth: { '2023': 1000, '2024': 1100 },
+    section: [
+      {
+        status: 'active',
+        grade: '10th Grade',
+        section: 'A',
+        classCount: 32,
+        courseName: 'Web Development',
+        sectionCode: 'WD10A',
+        courseCode: 'WD001',
+        zoomLink: 'https://zoom.us/j/852963741'
+      }
+    ]
+  },
+  {
+    id: 'sch_11',
+    name: 'Dubai Future Academy',
+    principalName: 'Sheikh Ahmed Al Mansouri',
+    contactNumber: '+971-4-123-4567',
+    contactEmail: 'principal@dubaifuture.edu.ae',
+    country: 'UAE',
+    city: 'Dubai',
+    course: 'AI Bootcamp',
+    status: 'active',
+    totalStudents: 600,
+    enrollmentDate: '2024-03-08T00:00:00Z',
+    notes: 'Premium school with state-of-the-art facilities. Students very motivated and tech-savvy.',
+    contactPersonRole: 'Principal',
+    schoolCode: 'DFA011',
+    creationDate: '2024-03-08T00:00:00Z',
+    lastEdited: '2024-03-15T12:00:00Z',
+    studentGrowth: { '2023': 0, '2024': 600 },
+    section: [
+      {
+        status: 'active',
+        grade: '12th Grade',
+        section: 'A',
+        classCount: 20,
+        courseName: 'AI Bootcamp',
+        sectionCode: 'AI12A',
+        courseCode: 'AI001',
+        zoomLink: 'https://zoom.us/j/741852963'
+      }
+    ]
+  },
+  {
+    id: 'sch_12',
+    name: 'Paris Digital School',
+    principalName: 'Madame Sophie Dubois',
+    contactNumber: '+33-1-42-34-56-78',
+    contactEmail: 'directrice@parisdigital.edu.fr',
+    country: 'France',
+    city: 'Paris',
+    course: 'Mobile App Development',
+    status: 'suspended',
+    totalStudents: 450,
+    enrollmentDate: '2024-02-25T00:00:00Z',
+    notes: 'Suspended due to curriculum conflicts. Working on resolution with school administration.',
+    contactPersonRole: 'Director',
+    schoolCode: 'PDS012',
+    creationDate: '2024-02-25T00:00:00Z',
+    lastEdited: '2024-03-07T11:30:00Z',
+    studentGrowth: { '2023': 400, '2024': 450 },
+    section: [
+      {
+        status: 'suspended',
+        grade: '11th Grade',
+        section: 'C',
+        classCount: 18,
+        courseName: 'Mobile App Development',
+        sectionCode: 'MAD11C',
+        courseCode: 'MAD001',
+        zoomLink: 'https://zoom.us/j/369258147'
+      }
+    ]
+  }
+];
+
+// Mock lead data
+export const mockLeads = [
+  {
+    id: 'lead_1',
+    fullName: 'Sarah Johnson',
+    contactNumber: '+1-555-0123',
+    email: 'sarah.johnson@email.com',
+    leadType: 'Parent' as const,
+    programOfInterest: 'AI Bootcamp',
+    source: 'Facebook' as const,
+    notes: 'Interested in AI program for her 15-year-old son. Prefers weekend classes.',
+    status: 'New' as const,
+    createdAt: '2024-03-15T10:30:00Z',
+    updatedAt: '2024-03-15T10:30:00Z'
+  },
+  {
+    id: 'lead_2',
+    fullName: 'Springfield High School',
+    contactNumber: '+1-555-0456',
+    email: 'admin@springfield.edu',
+    leadType: 'School' as const,
+    programOfInterest: 'Robotics',
+    source: 'Event' as const,
+    notes: 'School principal interested in implementing robotics curriculum. Budget approved for 50 students.',
+    status: 'Contacted' as const,
+    createdAt: '2024-03-14T14:20:00Z',
+    updatedAt: '2024-03-15T09:15:00Z'
+  },
+  {
+    id: 'lead_3',
+    fullName: 'Michael Chen',
+    contactNumber: '+1-555-0789',
+    email: 'mchen@email.com',
+    leadType: 'Parent' as const,
+    programOfInterest: 'Hackathon',
+    source: 'WhatsApp' as const,
+    notes: 'Looking for coding competitions for daughter. Wants to know about upcoming hackathons.',
+    status: 'Follow-Up' as const,
+    createdAt: '2024-03-13T16:45:00Z',
+    updatedAt: '2024-03-14T11:30:00Z'
+  },
+  {
+    id: 'lead_4',
+    fullName: 'Riverside Academy',
+    contactNumber: '+1-555-0321',
+    email: 'info@riverside.edu',
+    leadType: 'School' as const,
+    programOfInterest: 'AI Bootcamp',
+    source: 'Referral' as const,
+    notes: 'Referred by Springfield High. Interested in AI program for grades 9-12.',
+    status: 'Converted' as const,
+    createdAt: '2024-03-10T08:15:00Z',
+    updatedAt: '2024-03-12T15:45:00Z'
+  },
+  {
+    id: 'lead_5',
+    fullName: 'Emma Rodriguez',
+    contactNumber: '+1-555-0654',
+    email: 'emma.rodriguez@email.com',
+    leadType: 'Parent' as const,
+    programOfInterest: 'Robotics',
+    source: 'Instagram' as const,
+    notes: 'Saw our robotics showcase on Instagram. Son is very interested in building robots.',
+    status: 'New' as const,
+    createdAt: '2024-03-15T12:00:00Z',
+    updatedAt: '2024-03-15T12:00:00Z'
+  },
+  {
+    id: 'lead_6',
+    fullName: 'Mountain View School',
+    contactNumber: '+1-555-0987',
+    email: 'contact@mountainview.edu',
+    leadType: 'School' as const,
+    programOfInterest: 'Hackathon',
+    source: 'Manual' as const,
+    notes: 'School wants to host a hackathon event. Need details about logistics and costs.',
+    status: 'Cold' as const,
+    createdAt: '2024-03-08T10:20:00Z',
+    updatedAt: '2024-03-11T14:30:00Z'
+  }
+];
+
+export const leadPrograms = [
+  'AI Bootcamp',
+  'Robotics',
+  'Hackathon',
+  'Coding Fundamentals',
+  'Web Development',
+  'Data Science',
+  'Cybersecurity'
+];
+
+export const leadSources = [
+  'Manual',
+  'Event',
+  'WhatsApp',
+  'Facebook',
+  'Instagram',
+  'Referral'
+] as const;
+
+export const leadStatuses = [
+  'New',
+  'Contacted',
+  'Follow-Up',
+  'Converted',
+  'Cold'
+] as const;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutGrid, School, TrendingUp, CreditCard, BookOpen, LogOut, Users } from 'lucide-react';
+import { LayoutGrid, School, TrendingUp, CreditCard, BookOpen, LogOut, Users, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
@@ -8,6 +8,9 @@ const navItems = [
   { icon: School, label: 'Schools', path: '/schools' },
   { icon: Users, label: 'Students', path: '/students' },
   { icon: TrendingUp, label: 'Sales', path: '/sales' },
+  { icon: Users, label: 'Leads', path: '/leads' },
+  { icon: TrendingUp, label: 'Revenue', path: '/revenue' },
+  { icon: Calendar , label: 'Tracker', path: '/tracker' },
   { icon: CreditCard, label: 'Payments', path: '/payments' },
   { icon: BookOpen, label: 'Courses', path: '/courses' },
 ];

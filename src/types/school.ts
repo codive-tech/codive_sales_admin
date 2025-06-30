@@ -57,7 +57,7 @@ export interface SchoolData {
   name: string;
   contactPerson?: string;
   contactEmail: string;
-  contactPhone: string;
+  contactPhone?: string;
   contactPersonRole: string;
   address?: Address;
   principalName?: string;
@@ -69,4 +69,11 @@ export interface SchoolData {
   section?: Course[];
   salesPersonId?: string;
   course?: string;
+  // Additional properties for enhanced functionality
+  contactNumber?: string;
+  country?: string;
+  city?: string;
+  totalStudents?: number;
+  enrollmentDate?: string;
+  notes?: string;
 }

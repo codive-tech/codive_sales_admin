@@ -1,207 +1,339 @@
 import React, { useState } from 'react';
-import { DataTable } from '../components/interactive/DataTable';
 import { Student, CreateStudentData } from '../types';
-import AddStudentModal from '../components/students/AddStudentModal';
-import EditStudentModal from '../components/students/EditStudentModal';
-import SuccessModal from '../components/students/SuccessModal';
-import { Edit } from 'lucide-react';
+import { StudentFilters } from '../components/students/StudentFilters';
+import { StudentTable } from '../components/students/StudentTable';
+import { AddStudentModal } from '../components/students/AddStudentModal';
+import { EditStudentModal } from '../components/students/EditStudentModal';
+import { StudentProfileModal } from '../components/students/StudentProfileModal';
+import { filterData } from '../utils/filters';
+import { Plus, Users, Download, GraduationCap } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-// Mock data for students
-const mockStudents: Student[] = [];
+// Mock data for students with enhanced fields
+const mockStudents: Student[] = [
+  {
+    id: '1',
+    fullName: 'Aarav Sharma',
+    phoneNumber: '9876543210',
+    email: 'aarav.sharma@email.com',
+    grade: '8',
+    school: 'Delhi Public School',
+    program: 'AI Bootcamp',
+    status: 'active',
+    paymentStatus: 'paid',
+    enrollmentType: 'b2b',
+    notes: 'Excellent progress in AI fundamentals',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z'
+  },
+  {
+    id: '2',
+    fullName: 'Zara Patel',
+    phoneNumber: '8765432109',
+    email: 'zara.patel@email.com',
+    grade: '10',
+    school: 'St. Mary\'s Academy',
+    program: 'Robotics 101',
+    status: 'active',
+    paymentStatus: 'unpaid',
+    enrollmentType: 'b2b',
+    notes: 'Shows great interest in robotics',
+    createdAt: '2024-01-20T14:30:00Z',
+    updatedAt: '2024-01-20T14:30:00Z'
+  },
+  {
+    id: '3',
+    fullName: 'Rohan Kumar',
+    phoneNumber: '7654321098',
+    email: 'rohan.kumar@email.com',
+    grade: '6',
+    school: '',
+    program: 'Coding Fundamentals',
+    status: 'completed',
+    paymentStatus: 'paid',
+    enrollmentType: 'b2c',
+    notes: 'Completed course successfully',
+    createdAt: '2023-12-01T09:15:00Z',
+    updatedAt: '2024-01-10T16:45:00Z'
+  },
+  {
+    id: '4',
+    fullName: 'Ananya Singh',
+    phoneNumber: '6543210987',
+    email: 'ananya.singh@email.com',
+    grade: '9',
+    school: 'Modern School',
+    program: 'Data Science',
+    status: 'dropped',
+    paymentStatus: 'unpaid',
+    enrollmentType: 'b2b',
+    notes: 'Dropped due to schedule conflicts',
+    createdAt: '2024-01-05T11:20:00Z',
+    updatedAt: '2024-01-25T13:10:00Z'
+  },
+  {
+    id: '5',
+    fullName: 'Vihaan Reddy',
+    phoneNumber: '5432109876',
+    email: 'vihaan.reddy@email.com',
+    grade: '7',
+    school: '',
+    program: 'Web Development',
+    status: 'active',
+    paymentStatus: 'paid',
+    enrollmentType: 'b2c',
+    notes: 'Making good progress in web development',
+    createdAt: '2024-01-12T15:45:00Z',
+    updatedAt: '2024-01-12T15:45:00Z'
+  }
+];
 
 const Students: React.FC = () => {
   const [students, setStudents] = useState<Student[]>(mockStudents);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [classTypeFilter, setClassTypeFilter] = useState<'all' | 'group' | 'one2one'>('all');
-  const [lastAddedStudentEmail, setLastAddedStudentEmail] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [schoolFilter, setSchoolFilter] = useState('');
+  const [programFilter, setProgramFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddStudent = (studentData: CreateStudentData) => {
-
-    const newStudent: Student = {
-      id: Date.now().toString(),
-      ...studentData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    setStudents([...students, newStudent]);
-    setIsModalOpen(false);
-    
-    // Show success modal
-    setLastAddedStudentEmail(studentData.email);
-    setIsSuccessModalOpen(true);
-  };
-
-  const handleEditStudent = (studentData: CreateStudentData) => {
-    if (selectedStudent) {
-      const updatedStudents = students.map(student => 
-        student.id === selectedStudent.id 
-          ? { 
-              ...student, 
-              ...studentData, 
-              updatedAt: new Date().toISOString() 
-            }
-          : student
-      );
-      setStudents(updatedStudents);
-      setIsEditModalOpen(false);
-      setSelectedStudent(null);
-    }
-  };
-
-  const handleEditClick = (student: Student) => {
-    setSelectedStudent(student);
-    setIsEditModalOpen(true);
-  };
-
-  const handleResetPassword = () => {
-    // Here you would typically call an API to send password reset email
-    console.log('Sending password reset email to:', lastAddedStudentEmail);
-    
-    // Show a toast or notification
-    alert(`Password reset email sent to ${lastAddedStudentEmail}`);
-    
-    // Close the success modal
-    setIsSuccessModalOpen(false);
-  };
-
-  const handleCloseSuccessModal = () => {
-    setIsSuccessModalOpen(false);
-    setLastAddedStudentEmail('');
-  };
-
-  // Filter students based on class type
-  const filteredStudents = students.filter(student => {
-    if (classTypeFilter === 'all') return true;
-    return student.classType === classTypeFilter;
+  // Filter students based on all criteria
+  const filteredStudents = filterData(
+    students,
+    searchQuery,
+    'fullName',
+    ['fullName', 'email', 'school']
+  ).filter((student) => {
+    if (schoolFilter && student?.school !== schoolFilter) return false;
+    if (programFilter && student?.program !== programFilter) return false;
+    if (statusFilter && student?.status !== statusFilter) return false;
+    return true;
   });
 
-  const columns = [
-    { key: 'fullName' as keyof Student, label: 'Full Name' },
-    { 
-      key: 'phoneNumber' as keyof Student, 
-      label: 'Phone Number',
-      render: (value: any, item: Student) => (
-        <span>+{item.studentCountryCode} {item.phoneNumber}</span>
-      )
-    },
-    { key: 'email' as keyof Student, label: 'Email' },
-    { key: 'birthday' as keyof Student, label: 'Birthday' },
-    { key: 'country' as keyof Student, label: 'Country' },
-    { key: 'school' as keyof Student, label: 'School' },
-    { 
-      key: 'classType' as keyof Student, 
-      label: 'Class Type',
-      render: (value: any, item: Student) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          item.classType === 'group' 
-            ? 'bg-blue-100 text-blue-800' 
-            : 'bg-green-100 text-green-800'
-        }`}>
-          {item.classType === 'group' ? 'Group' : 'One-on-One'}
-        </span>
-      )
-    },
-    { key: 'parentName' as keyof Student, label: 'Parent/Guardian' },
-    { 
-      key: 'parentPhone' as keyof Student, 
-      label: 'Parent Phone',
-      render: (value: any, item: Student) => (
-        <span>+{item.parentCountryCode} {item.parentPhone}</span>
-      )
-    },
-    { key: 'parentEmail' as keyof Student, label: 'Parent Email' },
-    { 
-      key: 'id' as keyof Student, 
-      label: 'Actions',
-      render: (value: any, item: Student) => (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleEditClick(item);
-          }}
-          className="flex items-center gap-2 px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
-        >
-          <Edit className="h-4 w-4" />
-          Edit
-        </button>
-      )
+  const handleAddStudent = async (studentData: CreateStudentData) => {
+    setIsLoading(true);
+    try {
+      const newStudent: Student = {
+        id: Date.now().toString(),
+        ...studentData,
+        status: 'active',
+        paymentStatus: 'unpaid',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      setStudents([...students, newStudent]);
+      setShowAddModal(false);
+      toast.success('Student enrolled successfully!');
+    } catch (error) {
+      console.error('Error enrolling student:', error);
+      toast.error('Failed to enroll student. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  const handleEditStudent = (student: Student) => {
+    setSelectedStudent(student);
+    setShowEditModal(true);
+  };
+
+  const handleUpdateStudent = async (studentData: CreateStudentData & { status?: 'active' | 'completed' | 'dropped'; paymentStatus?: 'paid' | 'unpaid' | 'pending' }) => {
+    if (!selectedStudent) return;
+    
+    setIsLoading(true);
+    try {
+      const updatedStudent: Student = {
+        ...selectedStudent,
+        ...studentData,
+        updatedAt: new Date().toISOString()
+      };
+      
+      setStudents(students.map(s => s.id === selectedStudent.id ? updatedStudent : s));
+      setShowEditModal(false);
+      setSelectedStudent(undefined);
+      toast.success('Student updated successfully!');
+    } catch (error) {
+      console.error('Error updating student:', error);
+      toast.error('Failed to update student. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleViewStudent = (student: Student) => {
+    setSelectedStudent(student);
+    setShowProfileModal(true);
+  };
+
+  const handleReassignStudent = (student: Student) => {
+    setSelectedStudent(student);
+    // For now, we'll just show a toast. You can implement reassign modal later
+    toast.info('Program reassignment will be implemented soon!');
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSchoolFilter('');
+    setProgramFilter('');
+    setStatusFilter('');
+  };
+
+  const handleExportCSV = () => {
+    const csvContent = [
+      ['Student Name', 'Grade', 'School', 'Program', 'Status', 'Payment Status', 'Email', 'Phone', 'Enrollment Type'],
+      ...filteredStudents.map(student => [
+        student.fullName || '',
+        `Grade ${student.grade || 'N/A'}`,
+        student.school || 'Direct Enrollment',
+        student.program || 'Not Assigned',
+        student.status || '',
+        student.paymentStatus || '',
+        student.email || '',
+        student.phoneNumber || '',
+        student.enrollmentType || 'b2c'
+      ])
+    ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `students_export_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    toast.success('Students data exported successfully!');
+  };
+
+  // Calculate statistics
+  const totalStudents = students.length;
+  const activeStudents = students.filter(s => s.status === 'active').length;
+  const completedStudents = students.filter(s => s.status === 'completed').length;
+  const unpaidStudents = students.filter(s => s.paymentStatus === 'unpaid').length;
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Students</h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Add Student
-        </button>
-      </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-[#E0E0E0] p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-[#E6F6FB] rounded-lg">
+              <Users className="h-6 w-6 text-[#00AEEF]" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-[#1E2A3B]">Manage Students</h1>
+              <p className="text-sm text-[#666] mt-1">
+                {filteredStudents.length} of {totalStudents} students
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleExportCSV}
+              className="inline-flex items-center gap-2 px-4 py-2 text-[#666] border border-[#E0E0E0] rounded-lg hover:bg-[#E6F6FB] transition-colors"
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#00AEEF] text-white rounded-lg hover:bg-[#0095D9] transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Enroll Student
+            </button>
+          </div>
+        </div>
 
-      {/* Filter Section */}
-      <div className="mb-6 bg-white rounded-lg shadow p-4">
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700">Filter by Class Type:</label>
-          <select
-            value={classTypeFilter}
-            onChange={(e) => setClassTypeFilter(e.target.value as 'all' | 'group' | 'one2one')}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">All Students</option>
-            <option value="group">Group Classes</option>
-            <option value="one2one">One-on-One Classes</option>
-          </select>
-          <span className="text-sm text-gray-500">
-            {filteredStudents.length} of {students.length} students
-          </span>
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-[#E0E0E0]">
+          <div className="bg-[#E6F6FB] rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-[#00AEEF]" />
+              <span className="text-sm font-medium text-[#1E2A3B]">Total</span>
+            </div>
+            <p className="text-2xl font-bold text-[#1E2A3B] mt-1">{totalStudents}</p>
+          </div>
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-5 rounded-full bg-[#49c57a]"></div>
+              <span className="text-sm font-medium text-[#1E2A3B]">Active</span>
+            </div>
+            <p className="text-2xl font-bold text-[#49c57a] mt-1">{activeStudents}</p>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-5 rounded-full bg-[#00AEEF]"></div>
+              <span className="text-sm font-medium text-[#1E2A3B]">Completed</span>
+            </div>
+            <p className="text-2xl font-bold text-[#00AEEF] mt-1">{completedStudents}</p>
+          </div>
+          <div className="bg-yellow-50 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-5 rounded-full bg-[#FFD600]"></div>
+              <span className="text-sm font-medium text-[#1E2A3B]">Unpaid</span>
+            </div>
+            <p className="text-2xl font-bold text-[#FFD600] mt-1">{unpaidStudents}</p>
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        {filteredStudents.length > 0 ? (
-          <DataTable
-            data={filteredStudents}
-            columns={columns}
-          />
-        ) : (
-          <div className="p-8 text-center">
-            <div className="text-gray-500 text-lg font-medium">No records found</div>
-            <div className="text-gray-400 text-sm mt-2">
-              {students.length === 0 
-                ? "No students have been added yet." 
-                : "No students match the selected filter."
-              }
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Filters */}
+      <StudentFilters
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        schoolFilter={schoolFilter}
+        onSchoolChange={setSchoolFilter}
+        programFilter={programFilter}
+        onProgramChange={setProgramFilter}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+        onClearFilters={handleClearFilters}
+      />
 
+      {/* Student Table */}
+      <StudentTable
+        students={filteredStudents}
+        onEdit={handleEditStudent}
+        onView={handleViewStudent}
+        onReassign={handleReassignStudent}
+      />
+
+      {/* Add Student Modal */}
       <AddStudentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
         onSubmit={handleAddStudent}
+        isLoading={isLoading}
       />
 
+      {/* Edit Student Modal */}
       <EditStudentModal
-        isOpen={isEditModalOpen}
+        isOpen={showEditModal}
         onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedStudent(null);
+          setShowEditModal(false);
+          setSelectedStudent(undefined);
         }}
-        onSubmit={handleEditStudent}
+        onSubmit={handleUpdateStudent}
         student={selectedStudent}
+        isLoading={isLoading}
       />
 
-      <SuccessModal
-        isOpen={isSuccessModalOpen}
-        onClose={handleCloseSuccessModal}
-        studentEmail={lastAddedStudentEmail}
-        onResetPassword={handleResetPassword}
+      {/* Student Profile Modal */}
+      <StudentProfileModal
+        isOpen={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false);
+          setSelectedStudent(undefined);
+        }}
+        student={selectedStudent}
       />
     </div>
   );

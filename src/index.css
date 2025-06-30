@@ -1,3 +1,101 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom animations for login page */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* Animation classes */
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s ease-out;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+}
+
+/* Custom focus styles for better accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:ring-offset-2;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-[#00AEEF] text-white font-medium rounded-lg px-4 py-2 hover:bg-[#0095D9] focus-ring transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98];
+}
+
+.btn-secondary {
+  @apply bg-white text-[#666] font-medium rounded-lg px-4 py-2 border border-[#E0E0E0] hover:bg-[#E6F6FB] hover:text-[#1E2A3B] focus-ring transition-all duration-200;
+}
+
+/* Custom input styles */
+.input-field {
+  @apply block w-full px-3 py-2 border border-[#E0E0E0] rounded-lg focus-ring transition-colors duration-200 hover:border-[#00AEEF];
+}
+
+/* Loading spinner */
+.spinner {
+  @apply animate-spin rounded-full border-2 border-white border-t-transparent;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-2xl shadow-xl border border-[#E0E0E0] p-6;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
