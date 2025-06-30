@@ -124,6 +124,20 @@ const LeadFiltersPanel: React.FC<LeadFiltersPanelProps> = ({
           </select>
         </div>
 
+        {/* Campaign ID */}
+        <div>
+          <label className="block text-sm font-medium text-[#333333] mb-2">
+            Campaign ID
+          </label>
+          <input
+            type="text"
+            value={filters.campaignId}
+            onChange={(e) => handleFilterChange('campaignId', e.target.value)}
+            placeholder="Filter by campaign ID..."
+            className="w-full px-3 py-2 border border-[#E0E0E0] rounded-md focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+          />
+        </div>
+
         {/* Date Range */}
         <div>
           <label className="block text-sm font-medium text-[#333333] mb-2">

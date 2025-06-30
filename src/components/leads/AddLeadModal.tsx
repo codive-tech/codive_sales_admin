@@ -17,7 +17,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ isOpen, onClose, onSubmit }
     programOfInterest: '',
     source: 'Manual',
     notes: '',
-    status: 'New'
+    status: 'New',
+    campaignId: ''
   });
 
   const handleInputChange = (field: keyof CreateLeadData, value: string) => {
@@ -38,7 +39,8 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ isOpen, onClose, onSubmit }
       programOfInterest: '',
       source: 'Manual',
       notes: '',
-      status: 'New'
+      status: 'New',
+      campaignId: ''
     });
     onClose();
   };
@@ -154,6 +156,20 @@ const AddLeadModal: React.FC<AddLeadModalProps> = ({ isOpen, onClose, onSubmit }
                 <option key={source} value={source}>{source}</option>
               ))}
             </select>
+          </div>
+
+          {/* Campaign ID */}
+          <div>
+            <label className="block text-sm font-medium text-[#333333] mb-1">
+              Campaign ID (Optional)
+            </label>
+            <input
+              type="text"
+              value={formData.campaignId}
+              onChange={(e) => handleInputChange('campaignId', e.target.value)}
+              className="w-full px-3 py-2 border border-[#E0E0E0] rounded-md focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+              placeholder="e.g., SUMMER2024, FACEBOOK_ADS"
+            />
           </div>
 
           {/* Status */}

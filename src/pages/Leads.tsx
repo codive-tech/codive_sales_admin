@@ -1,20 +1,25 @@
 import React, { useState, useMemo } from 'react';
-import { Lead, CreateLeadData, LeadFilters } from '../types';
+import { Lead, CreateLeadData, LeadFilters, LeadNote } from '../types';
 import { mockLeads } from '../data/mockData';
 import LeadFiltersPanel from '../components/leads/LeadFiltersPanel';
 import AddLeadModal from '../components/leads/AddLeadModal';
 import LeadsTable from '../components/leads/LeadsTable';
+import { FunnelChart } from '../components/leads/FunnelChart';
+import { LeadNotesModal } from '../components/leads/LeadNotesModal';
 import Toast from '../components/ui/Toast';
 
 const Leads: React.FC = () => {
   const [leads, setLeads] = useState<Lead[]>(mockLeads);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [filters, setFilters] = useState<LeadFilters>({
     search: '',
     leadType: '',
     status: '',
     program: '',
     source: '',
+    campaignId: '',
     dateRange: {
       start: '',
       end: ''
@@ -63,6 +68,14 @@ const Leads: React.FC = () => {
         return false;
       }
 
+      // Campaign ID filter
+      if (filters.campaignId) {
+        const campaignLower = filters.campaignId.toLowerCase();
+        if (!lead.campaignId || !lead.campaignId.toLowerCase().includes(campaignLower)) {
+          return false;
+        }
+      }
+
       // Date range filter
       if (filters.dateRange.start || filters.dateRange.end) {
         const leadDate = new Date(lead.createdAt);
@@ -105,6 +118,22 @@ const Leads: React.FC = () => {
     showToast('Edit functionality coming soon!', 'info');
   };
 
+  const handleViewNotes = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsNotesModalOpen(true);
+  };
+
+  const handleAddNote = (leadId: string, noteData: Omit<LeadNote, 'id' | 'createdAt'>) => {
+    // In a real app, this would be saved to an API
+    const newNote: LeadNote = {
+      ...noteData,
+      id: `note_${Date.now()}`,
+      createdAt: new Date().toISOString()
+    };
+
+    showToast('Note added successfully!', 'success');
+  };
+
   const handleResetFilters = () => {
     setFilters({
       search: '',
@@ -112,6 +141,7 @@ const Leads: React.FC = () => {
       status: '',
       program: '',
       source: '',
+      campaignId: '',
       dateRange: {
         start: '',
         end: ''
@@ -151,6 +181,9 @@ const Leads: React.FC = () => {
           </div>
         </div>
 
+        {/* Conversion Funnel Chart */}
+        <FunnelChart leads={filteredLeads} />
+
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters Panel */}
@@ -168,6 +201,7 @@ const Leads: React.FC = () => {
               leads={filteredLeads}
               onStatusChange={handleStatusChange}
               onEditLead={handleEditLead}
+              onViewNotes={handleViewNotes}
             />
           </div>
         </div>
@@ -178,6 +212,17 @@ const Leads: React.FC = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSubmit={handleAddLead}
+      />
+
+      {/* Lead Notes Modal */}
+      <LeadNotesModal
+        isOpen={isNotesModalOpen}
+        onClose={() => {
+          setIsNotesModalOpen(false);
+          setSelectedLead(null);
+        }}
+        lead={selectedLead}
+        onAddNote={handleAddNote}
       />
 
       {/* Toast Notifications */}

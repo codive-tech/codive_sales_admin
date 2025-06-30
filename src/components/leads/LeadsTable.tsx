@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Lead } from '../../types';
 import LeadStatusBadge from './LeadStatusBadge';
 import { leadStatuses } from '../../data/mockData';
+import { WhatsAppButton } from './WhatsAppButton';
 
 interface LeadsTableProps {
   leads: Lead[];
   onStatusChange: (leadId: string, newStatus: Lead['status']) => void;
   onEditLead: (lead: Lead) => void;
+  onViewNotes: (lead: Lead) => void;
 }
 
-const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLead }) => {
+const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLead, onViewNotes }) => {
   const [editingStatus, setEditingStatus] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
@@ -50,12 +52,13 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
       {/* Desktop Table */}
       <div className="hidden lg:block overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-[#E6F6FB]">
+          <thead className="bg-[#E6F6FB] sticky top-0">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Name</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Type</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Program</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Contact</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Campaign</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Status</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Source</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Created On</th>
@@ -82,7 +85,25 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
                   </span>
                 </td>
                 <td className="px-6 py-4 text-[#333333]">{lead.programOfInterest}</td>
-                <td className="px-6 py-4 text-[#333333]">{lead.contactNumber}</td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[#333333]">{lead.contactNumber}</span>
+                    <WhatsAppButton
+                      phoneNumber={lead.contactNumber}
+                      leadName={lead.fullName}
+                      programOfInterest={lead.programOfInterest}
+                    />
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  {lead.campaignId ? (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#D0F0FA] text-[#1E2A3B]">
+                      {lead.campaignId}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 text-sm">-</span>
+                  )}
+                </td>
                 <td className="px-6 py-4">
                   {editingStatus === lead.id ? (
                     <select
@@ -108,7 +129,14 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
                 <td className="px-6 py-4 text-[#333333]">{lead.source}</td>
                 <td className="px-6 py-4 text-[#333333]">{formatDate(lead.createdAt)}</td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => onViewNotes(lead)}
+                      className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors"
+                    >
+                      View Notes
+                    </button>
+                    <span className="text-gray-300">|</span>
                     <button
                       onClick={() => onEditLead(lead)}
                       className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors"
@@ -145,9 +173,20 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
                     {lead.leadType}
                   </span>
                   <LeadStatusBadge status={lead.status} />
+                  {lead.campaignId && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#D0F0FA] text-[#1E2A3B]">
+                      {lead.campaignId}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="flex space-x-2">
+                <button
+                  onClick={() => onViewNotes(lead)}
+                  className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors"
+                >
+                  Notes
+                </button>
                 <button
                   onClick={() => onEditLead(lead)}
                   className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors"
@@ -165,7 +204,15 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
             
             <div className="space-y-1 text-sm text-[#333333]">
               <div><span className="font-medium">Program:</span> {lead.programOfInterest}</div>
-              <div><span className="font-medium">Contact:</span> {lead.contactNumber}</div>
+              <div className="flex items-center space-x-2">
+                <span className="font-medium">Contact:</span> 
+                <span>{lead.contactNumber}</span>
+                <WhatsAppButton
+                  phoneNumber={lead.contactNumber}
+                  leadName={lead.fullName}
+                  programOfInterest={lead.programOfInterest}
+                />
+              </div>
               {lead.email && <div><span className="font-medium">Email:</span> {lead.email}</div>}
               <div><span className="font-medium">Source:</span> {lead.source}</div>
               <div><span className="font-medium">Created:</span> {formatDate(lead.createdAt)}</div>

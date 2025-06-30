@@ -70,6 +70,7 @@ export interface Lead {
   source: 'Manual' | 'Event' | 'WhatsApp' | 'Facebook' | 'Instagram' | 'Referral';
   notes?: string;
   status: 'New' | 'Contacted' | 'Follow-Up' | 'Converted' | 'Cold';
+  campaignId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -83,6 +84,16 @@ export interface CreateLeadData {
   source: 'Manual' | 'Event' | 'WhatsApp' | 'Facebook' | 'Instagram' | 'Referral';
   notes?: string;
   status: 'New' | 'Contacted' | 'Follow-Up' | 'Converted' | 'Cold';
+  campaignId?: string;
+}
+
+export interface LeadNote {
+  id: string;
+  leadId: string;
+  content: string;
+  type: 'contact' | 'followup' | 'admin' | 'conversion';
+  createdAt: string;
+  createdBy?: string;
 }
 
 export interface LeadFilters {
@@ -91,6 +102,7 @@ export interface LeadFilters {
   status: string;
   program: string;
   source: string;
+  campaignId: string;
   dateRange: {
     start: string;
     end: string;

@@ -431,6 +431,7 @@ export const mockLeads = [
     source: 'Facebook' as const,
     notes: 'Interested in AI program for her 15-year-old son. Prefers weekend classes.',
     status: 'New' as const,
+    campaignId: 'SUMMER2024',
     createdAt: '2024-03-15T10:30:00Z',
     updatedAt: '2024-03-15T10:30:00Z'
   },
@@ -444,6 +445,7 @@ export const mockLeads = [
     source: 'Event' as const,
     notes: 'School principal interested in implementing robotics curriculum. Budget approved for 50 students.',
     status: 'Contacted' as const,
+    campaignId: 'EDU_CONF_2024',
     createdAt: '2024-03-14T14:20:00Z',
     updatedAt: '2024-03-15T09:15:00Z'
   },
@@ -457,6 +459,7 @@ export const mockLeads = [
     source: 'WhatsApp' as const,
     notes: 'Looking for coding competitions for daughter. Wants to know about upcoming hackathons.',
     status: 'Follow-Up' as const,
+    campaignId: 'WHATSAPP_ADS',
     createdAt: '2024-03-13T16:45:00Z',
     updatedAt: '2024-03-14T11:30:00Z'
   },
@@ -470,6 +473,7 @@ export const mockLeads = [
     source: 'Referral' as const,
     notes: 'Referred by Springfield High. Interested in AI program for grades 9-12.',
     status: 'Converted' as const,
+    campaignId: 'REFERRAL_PROGRAM',
     createdAt: '2024-03-10T08:15:00Z',
     updatedAt: '2024-03-12T15:45:00Z'
   },
@@ -483,6 +487,7 @@ export const mockLeads = [
     source: 'Instagram' as const,
     notes: 'Saw our robotics showcase on Instagram. Son is very interested in building robots.',
     status: 'New' as const,
+    campaignId: 'INSTAGRAM_ADS',
     createdAt: '2024-03-15T12:00:00Z',
     updatedAt: '2024-03-15T12:00:00Z'
   },
