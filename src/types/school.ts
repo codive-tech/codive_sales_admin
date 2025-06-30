@@ -52,6 +52,12 @@ interface StudentGrowth {
   [year: string]: number;  // Dynamic key-value pair for different years
 }
 
+export interface GradeAllocation {
+  grade: number;
+  students: number;
+  sections: string[];
+}
+
 export interface SchoolData {
   id?: string;
   name: string;
@@ -74,6 +80,10 @@ export interface SchoolData {
   country?: string;
   city?: string;
   totalStudents?: number;
+  totalStudentsExpected?: number; // New field for expected enrollment
+  lockedDealAmount?: number; // New field for deal amount
+  lockedDealCurrency?: string; // New field for deal currency
   enrollmentDate?: string;
   notes?: string;
+  gradeAllocations?: GradeAllocation[]; // New field for grade and section allocations
 }

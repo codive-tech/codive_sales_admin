@@ -89,24 +89,24 @@ export function PaymentStatusBadge({ status, size = 'md' }: PaymentStatusBadgePr
 }
 
 interface EnrollmentTypeBadgeProps {
-  type: 'b2b' | 'b2c';
+  type: 'group' | 'one2one';
   size?: 'sm' | 'md' | 'lg';
 }
 
 export function EnrollmentTypeBadge({ type, size = 'md' }: EnrollmentTypeBadgeProps) {
   const typeConfig = {
-    b2b: {
-      bgColor: 'bg-purple-100',
-      textColor: 'text-purple-800',
-      borderColor: 'border-purple-200',
-      label: 'B2B',
-      icon: '🏢'
+    group: {
+      bgColor: 'bg-[#E6F6FB]',
+      textColor: 'text-[#00AEEF]',
+      borderColor: 'border-[#00AEEF]',
+      label: 'Group',
+      icon: '👥'
     },
-    b2c: {
-      bgColor: 'bg-blue-100',
-      textColor: 'text-blue-800',
-      borderColor: 'border-blue-200',
-      label: 'B2C',
+    one2one: {
+      bgColor: 'bg-[#FFD600]',
+      textColor: 'text-[#1E2A3B]',
+      borderColor: 'border-[#FFD600]',
+      label: 'One-to-One',
       icon: '👤'
     }
   };

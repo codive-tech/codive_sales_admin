@@ -40,15 +40,15 @@ const programs = [
   { label: 'Mobile App Development', value: 'Mobile App Development' }
 ];
 
-const schools = [
-  { label: 'Direct Enrollment (B2C)', value: '' },
-  { label: 'Delhi Public School', value: 'Delhi Public School' },
-  { label: 'St. Mary\'s Academy', value: 'St. Mary\'s Academy' },
-  { label: 'Modern School', value: 'Modern School' },
-  { label: 'Kendriya Vidyalaya', value: 'Kendriya Vidyalaya' },
-  { label: 'DPS International', value: 'DPS International' },
-  { label: 'The British School', value: 'The British School' },
-  { label: 'American Embassy School', value: 'American Embassy School' }
+const leadTypes = [
+  { label: 'Select Lead Type', value: '' },
+  { label: 'Referral', value: 'Referral' },
+  { label: 'WhatsApp', value: 'WhatsApp' },
+  { label: 'Facebook', value: 'Facebook' },
+  { label: 'Website', value: 'Website' },
+  { label: 'Event', value: 'Event' },
+  { label: 'School Fair', value: 'School Fair' },
+  { label: 'Other', value: 'Other' }
 ];
 
 export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }: AddStudentModalProps) {
@@ -56,10 +56,11 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
     fullName: '',
     phoneNumber: '',
     email: '',
+    age: undefined,
     grade: '',
     program: '',
-    school: '',
-    enrollmentType: 'b2c',
+    enrollmentType: 'group',
+    leadType: undefined,
     notes: ''
   });
 
@@ -82,12 +83,20 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
       newErrors.email = 'Please enter a valid email address';
     }
 
+    if (!formData.age || formData.age < 1) {
+      newErrors.age = 'Age is required and must be at least 1';
+    }
+
     if (!formData.grade?.trim()) {
       newErrors.grade = 'Grade is required';
     }
 
     if (!formData.program?.trim()) {
       newErrors.program = 'Program is required';
+    }
+
+    if (!formData.leadType?.trim()) {
+      newErrors.leadType = 'Lead type is required';
     }
 
     setErrors(newErrors);
@@ -102,7 +111,7 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
     }
   };
 
-  const handleInputChange = (field: keyof CreateStudentData, value: string) => {
+  const handleInputChange = (field: keyof CreateStudentData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear error when user starts typing
@@ -116,10 +125,11 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
       fullName: '',
       phoneNumber: '',
       email: '',
+      age: undefined,
       grade: '',
       program: '',
-      school: '',
-      enrollmentType: 'b2c',
+      enrollmentType: 'group',
+      leadType: undefined,
       notes: ''
     });
     setErrors({});
@@ -163,7 +173,7 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
               Student Information
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
                   Full Name *
@@ -179,6 +189,26 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
                 />
                 {errors.fullName && (
                   <p className="text-sm text-[#f55a5a] mt-1">{errors.fullName}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                  Age *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="25"
+                  value={formData.age || ''}
+                  onChange={(e) => handleInputChange('age', parseInt(e.target.value) || 0)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent ${
+                    errors.age ? 'border-[#f55a5a]' : 'border-[#E0E0E0]'
+                  }`}
+                  placeholder="Enter age"
+                />
+                {errors.age && (
+                  <p className="text-sm text-[#f55a5a] mt-1">{errors.age}</p>
                 )}
               </div>
 
@@ -252,11 +282,11 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
             </div>
           </div>
 
-          {/* Program & School */}
+          {/* Program & Enrollment Type */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
-              Program & School
+              Program & Enrollment Type
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -284,49 +314,54 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
 
               <div>
                 <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
-                  School (Optional)
+                  Lead Type *
                 </label>
                 <select
-                  value={formData.school}
-                  onChange={(e) => handleInputChange('school', e.target.value)}
-                  className="w-full px-3 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+                  value={formData.leadType}
+                  onChange={(e) => handleInputChange('leadType', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent ${
+                    errors.leadType ? 'border-[#f55a5a]' : 'border-[#E0E0E0]'
+                  }`}
                 >
-                  {schools.map(school => (
-                    <option key={school.value} value={school.value}>
-                      {school.label}
+                  {leadTypes.map(leadType => (
+                    <option key={leadType.value} value={leadType.value}>
+                      {leadType.label}
                     </option>
                   ))}
                 </select>
+                {errors.leadType && (
+                  <p className="text-sm text-[#f55a5a] mt-1">{errors.leadType}</p>
+                )}
               </div>
             </div>
 
-            {/* Enrollment Type */}
+            {/* Enrollment Mode */}
             <div>
               <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
-                Enrollment Type
+                Enrollment Mode *
               </label>
               <div className="flex gap-3">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
                     name="enrollmentType"
-                    value="b2c"
-                    checked={formData.enrollmentType === 'b2c'}
+                    value="group"
+                    checked={formData.enrollmentType === 'group'}
                     onChange={(e) => handleInputChange('enrollmentType', e.target.value)}
                     className="text-[#00AEEF] focus:ring-[#00AEEF]"
                   />
-                  <span className="text-sm text-[#1E2A3B]">B2C (Direct)</span>
+                  <span className="text-sm text-[#1E2A3B]">Group Class</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
                     name="enrollmentType"
-                    value="b2b"
-                    checked={formData.enrollmentType === 'b2b'}
+                    value="one2one"
+                    checked={formData.enrollmentType === 'one2one'}
                     onChange={(e) => handleInputChange('enrollmentType', e.target.value)}
                     className="text-[#00AEEF] focus:ring-[#00AEEF]"
                   />
-                  <span className="text-sm text-[#1E2A3B]">B2B (School)</span>
+                  <span className="text-sm text-[#1E2A3B]">One-to-One Class</span>
                 </label>
               </div>
             </div>

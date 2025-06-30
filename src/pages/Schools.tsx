@@ -140,7 +140,7 @@ export function Schools() {
 
   const handleExportCSV = () => {
     const csvContent = [
-      ['School Name', 'School Code', 'Contact Person', 'Email', 'Phone', 'Location', 'Program', 'Status', 'Students', 'Enrollment Date'],
+      ['School Name', 'School Code', 'Contact Person', 'Email', 'Phone', 'Location', 'Program', 'Status', 'Expected Students', 'Current Students', 'Deal Amount', 'Deal Currency', 'Enrollment Date'],
       ...filteredSchools.map(school => [
         school.name || '',
         school.schoolCode || '',
@@ -150,7 +150,10 @@ export function Schools() {
         `${school.city || ''}, ${school.country || ''}`,
         school.course || 'Not Assigned',
         school.status || '',
+        school.totalStudentsExpected?.toString() || '0',
         school.totalStudents?.toString() || '0',
+        school.lockedDealAmount?.toString() || '0',
+        school.lockedDealCurrency || 'Not specified',
         school.enrollmentDate ? new Date(school.enrollmentDate).toLocaleDateString() : ''
       ])
     ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');

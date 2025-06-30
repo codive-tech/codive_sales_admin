@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  Filter
+  Filter,
+  DollarSign
 } from 'lucide-react';
 import { SchoolData } from '../../types/school';
 import { SchoolStatusBadge } from './SchoolStatusBadge';
@@ -26,7 +27,7 @@ interface SchoolTableProps {
   onSearchChange?: (query: string) => void;
 }
 
-type SortField = 'name' | 'country' | 'course' | 'totalStudents' | 'status' | 'enrollmentDate';
+type SortField = 'name' | 'country' | 'course' | 'totalStudents' | 'totalStudentsExpected' | 'lockedDealAmount' | 'status' | 'enrollmentDate';
 type SortDirection = 'asc' | 'desc';
 
 export function SchoolTable({ 
@@ -57,6 +58,12 @@ export function SchoolTable({
       } else if (sortField === 'totalStudents') {
         aValue = a.totalStudents || 0;
         bValue = b.totalStudents || 0;
+      } else if (sortField === 'totalStudentsExpected') {
+        aValue = a.totalStudentsExpected || 0;
+        bValue = b.totalStudentsExpected || 0;
+      } else if (sortField === 'lockedDealAmount') {
+        aValue = a.lockedDealAmount || 0;
+        bValue = b.lockedDealAmount || 0;
       }
 
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
@@ -89,6 +96,24 @@ export function SchoolTable({
     return sortDirection === 'asc' ? 
       <ChevronUp className="h-4 w-4 text-[#00AEEF]" /> : 
       <ChevronDown className="h-4 w-4 text-[#00AEEF]" />;
+  };
+
+  const formatCurrency = (amount: number | undefined, currency: string | undefined) => {
+    if (!amount || !currency) return 'Not specified';
+    
+    const currencySymbols: Record<string, string> = {
+      'INR': '₹',
+      'USD': '$',
+      'AED': 'AED',
+      'ZAR': 'R',
+      'EUR': '€',
+      'GBP': '£',
+      'CAD': 'C$',
+      'AUD': 'A$'
+    };
+    
+    const symbol = currencySymbols[currency] || currency;
+    return `${symbol}${amount.toLocaleString()}`;
   };
 
   if (schools.length === 0) {
@@ -169,11 +194,29 @@ export function SchoolTable({
                 </th>
                 <th 
                   className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider cursor-pointer hover:bg-[#D1F2F9] transition-colors"
+                  onClick={() => handleSort('totalStudentsExpected')}
+                >
+                  <div className="flex items-center gap-1">
+                    Expected Students
+                    <SortIcon field="totalStudentsExpected" />
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider cursor-pointer hover:bg-[#D1F2F9] transition-colors"
                   onClick={() => handleSort('totalStudents')}
                 >
                   <div className="flex items-center gap-1">
-                    Students
+                    Current Students
                     <SortIcon field="totalStudents" />
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider cursor-pointer hover:bg-[#D1F2F9] transition-colors"
+                  onClick={() => handleSort('lockedDealAmount')}
+                >
+                  <div className="flex items-center gap-1">
+                    Deal Amount
+                    <SortIcon field="lockedDealAmount" />
                   </div>
                 </th>
                 <th 
@@ -183,15 +226,6 @@ export function SchoolTable({
                   <div className="flex items-center gap-1">
                     Status
                     <SortIcon field="status" />
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider cursor-pointer hover:bg-[#D1F2F9] transition-colors"
-                  onClick={() => handleSort('enrollmentDate')}
-                >
-                  <div className="flex items-center gap-1">
-                    Enrollment Date
-                    <SortIcon field="enrollmentDate" />
                   </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider">
@@ -243,17 +277,23 @@ export function SchoolTable({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-[#1E2A3B]">
                       <Users className="h-4 w-4 text-[#666] mr-2" />
-                      {school.totalStudents || 0} students
+                      {school.totalStudentsExpected || 0} expected
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center text-sm text-[#1E2A3B]">
+                      <Users className="h-4 w-4 text-[#666] mr-2" />
+                      {school.totalStudents || 0} current
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center text-sm text-[#1E2A3B]">
+                      <DollarSign className="h-4 w-4 text-[#666] mr-2" />
+                      {formatCurrency(school.lockedDealAmount, school.lockedDealCurrency)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <SchoolStatusBadge status={school.status || 'inactive'} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-[#666]">
-                    {school.enrollmentDate ? 
-                      new Date(school.enrollmentDate).toLocaleDateString() : 
-                      'Not specified'
-                    }
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
@@ -334,18 +374,21 @@ export function SchoolTable({
                   <SchoolTag program={school.course || 'Not Assigned'} />
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#666]">Students:</span>
+                  <span className="text-[#666]">Expected Students:</span>
                   <span className="font-medium text-[#1E2A3B]">
-                    {school.totalStudents || 0} students
+                    {school.totalStudentsExpected || 0}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#666]">Enrolled:</span>
+                  <span className="text-[#666]">Current Students:</span>
                   <span className="font-medium text-[#1E2A3B]">
-                    {school.enrollmentDate ? 
-                      new Date(school.enrollmentDate).toLocaleDateString() : 
-                      'Not specified'
-                    }
+                    {school.totalStudents || 0}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Deal Amount:</span>
+                  <span className="font-medium text-[#1E2A3B]">
+                    {formatCurrency(school.lockedDealAmount, school.lockedDealCurrency)}
                   </span>
                 </div>
               </div>

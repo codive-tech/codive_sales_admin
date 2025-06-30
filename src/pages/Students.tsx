@@ -16,12 +16,13 @@ const mockStudents: Student[] = [
     fullName: 'Aarav Sharma',
     phoneNumber: '9876543210',
     email: 'aarav.sharma@email.com',
+    age: 14,
     grade: '8',
-    school: 'Delhi Public School',
     program: 'AI Bootcamp',
     status: 'active',
     paymentStatus: 'paid',
-    enrollmentType: 'b2b',
+    enrollmentType: 'group',
+    leadType: 'Referral',
     notes: 'Excellent progress in AI fundamentals',
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z'
@@ -31,12 +32,13 @@ const mockStudents: Student[] = [
     fullName: 'Zara Patel',
     phoneNumber: '8765432109',
     email: 'zara.patel@email.com',
+    age: 16,
     grade: '10',
-    school: 'St. Mary\'s Academy',
     program: 'Robotics 101',
     status: 'active',
     paymentStatus: 'unpaid',
-    enrollmentType: 'b2b',
+    enrollmentType: 'one2one',
+    leadType: 'WhatsApp',
     notes: 'Shows great interest in robotics',
     createdAt: '2024-01-20T14:30:00Z',
     updatedAt: '2024-01-20T14:30:00Z'
@@ -46,12 +48,13 @@ const mockStudents: Student[] = [
     fullName: 'Rohan Kumar',
     phoneNumber: '7654321098',
     email: 'rohan.kumar@email.com',
+    age: 12,
     grade: '6',
-    school: '',
     program: 'Coding Fundamentals',
     status: 'completed',
     paymentStatus: 'paid',
-    enrollmentType: 'b2c',
+    enrollmentType: 'group',
+    leadType: 'Website',
     notes: 'Completed course successfully',
     createdAt: '2023-12-01T09:15:00Z',
     updatedAt: '2024-01-10T16:45:00Z'
@@ -61,12 +64,13 @@ const mockStudents: Student[] = [
     fullName: 'Ananya Singh',
     phoneNumber: '6543210987',
     email: 'ananya.singh@email.com',
+    age: 15,
     grade: '9',
-    school: 'Modern School',
     program: 'Data Science',
     status: 'dropped',
     paymentStatus: 'unpaid',
-    enrollmentType: 'b2b',
+    enrollmentType: 'one2one',
+    leadType: 'Facebook',
     notes: 'Dropped due to schedule conflicts',
     createdAt: '2024-01-05T11:20:00Z',
     updatedAt: '2024-01-25T13:10:00Z'
@@ -76,12 +80,13 @@ const mockStudents: Student[] = [
     fullName: 'Vihaan Reddy',
     phoneNumber: '5432109876',
     email: 'vihaan.reddy@email.com',
+    age: 13,
     grade: '7',
-    school: '',
     program: 'Web Development',
     status: 'active',
     paymentStatus: 'paid',
-    enrollmentType: 'b2c',
+    enrollmentType: 'group',
+    leadType: 'Event',
     notes: 'Making good progress in web development',
     createdAt: '2024-01-12T15:45:00Z',
     updatedAt: '2024-01-12T15:45:00Z'
@@ -95,7 +100,6 @@ const Students: React.FC = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
-  const [schoolFilter, setSchoolFilter] = useState('');
   const [programFilter, setProgramFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -105,9 +109,8 @@ const Students: React.FC = () => {
     students,
     searchQuery,
     'fullName',
-    ['fullName', 'email', 'school']
+    ['fullName', 'email']
   ).filter((student) => {
-    if (schoolFilter && student?.school !== schoolFilter) return false;
     if (programFilter && student?.program !== programFilter) return false;
     if (statusFilter && student?.status !== statusFilter) return false;
     return true;
@@ -177,24 +180,24 @@ const Students: React.FC = () => {
 
   const handleClearFilters = () => {
     setSearchQuery('');
-    setSchoolFilter('');
     setProgramFilter('');
     setStatusFilter('');
   };
 
   const handleExportCSV = () => {
     const csvContent = [
-      ['Student Name', 'Grade', 'School', 'Program', 'Status', 'Payment Status', 'Email', 'Phone', 'Enrollment Type'],
+      ['Student Name', 'Age', 'Grade', 'Program', 'Lead Type', 'Status', 'Payment Status', 'Email', 'Phone', 'Enrollment Mode'],
       ...filteredStudents.map(student => [
         student.fullName || '',
+        student.age?.toString() || 'N/A',
         `Grade ${student.grade || 'N/A'}`,
-        student.school || 'Direct Enrollment',
         student.program || 'Not Assigned',
+        student.leadType || 'Not specified',
         student.status || '',
         student.paymentStatus || '',
         student.email || '',
         student.phoneNumber || '',
-        student.enrollmentType || 'b2c'
+        student.enrollmentType === 'group' ? 'Group Class' : 'One-to-One Class'
       ])
     ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
 
@@ -289,8 +292,6 @@ const Students: React.FC = () => {
       <StudentFilters
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        schoolFilter={schoolFilter}
-        onSchoolChange={setSchoolFilter}
         programFilter={programFilter}
         onProgramChange={setProgramFilter}
         statusFilter={statusFilter}

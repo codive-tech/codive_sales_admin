@@ -67,6 +67,9 @@ export const mockSchools = [
     course: 'AI Bootcamp',
     status: 'active',
     totalStudents: 1250,
+    totalStudentsExpected: 1500,
+    lockedDealAmount: 75000,
+    lockedDealCurrency: 'USD',
     enrollmentDate: '2024-01-15T00:00:00Z',
     notes: 'Excellent engagement with AI program. Students showing great progress in machine learning projects.',
     contactPersonRole: 'Principal',
@@ -74,6 +77,12 @@ export const mockSchools = [
     creationDate: '2024-01-15T00:00:00Z',
     lastEdited: '2024-03-10T14:30:00Z',
     studentGrowth: { '2023': 1150, '2024': 1250 },
+    gradeAllocations: [
+      { grade: 9, students: 200, sections: ['A', 'B', 'C', 'D'] },
+      { grade: 10, students: 180, sections: ['A', 'B', 'C'] },
+      { grade: 11, students: 150, sections: ['A', 'B'] },
+      { grade: 12, students: 120, sections: ['A'] }
+    ],
     section: [
       {
         status: 'active',
@@ -98,6 +107,9 @@ export const mockSchools = [
     course: 'Robotics 101',
     status: 'active',
     totalStudents: 850,
+    totalStudentsExpected: 1000,
+    lockedDealAmount: 55000,
+    lockedDealCurrency: 'USD',
     enrollmentDate: '2024-02-20T00:00:00Z',
     notes: 'Strong robotics program implementation. Students participating in regional competitions.',
     contactPersonRole: 'Administrator',
@@ -105,6 +117,11 @@ export const mockSchools = [
     creationDate: '2024-02-20T00:00:00Z',
     lastEdited: '2024-03-12T09:15:00Z',
     studentGrowth: { '2023': 800, '2024': 850 },
+    gradeAllocations: [
+      { grade: 8, students: 150, sections: ['A', 'B', 'C'] },
+      { grade: 9, students: 200, sections: ['A', 'B', 'C', 'D'] },
+      { grade: 10, students: 180, sections: ['A', 'B', 'C'] }
+    ],
     section: [
       {
         status: 'active',
@@ -129,6 +146,9 @@ export const mockSchools = [
     course: 'Coding Fundamentals',
     status: 'suspended',
     totalStudents: 650,
+    totalStudentsExpected: 800,
+    lockedDealAmount: 40000,
+    lockedDealCurrency: 'USD',
     enrollmentDate: '2024-01-10T00:00:00Z',
     notes: 'Access suspended due to payment issues. Contact made for resolution.',
     contactPersonRole: 'Principal',
@@ -136,6 +156,11 @@ export const mockSchools = [
     creationDate: '2024-01-10T00:00:00Z',
     lastEdited: '2024-03-08T16:45:00Z',
     studentGrowth: { '2023': 600, '2024': 650 },
+    gradeAllocations: [
+      { grade: 7, students: 120, sections: ['A', 'B'] },
+      { grade: 8, students: 150, sections: ['A', 'B', 'C'] },
+      { grade: 9, students: 180, sections: ['A', 'B', 'C', 'D'] }
+    ],
     section: [
       {
         status: 'suspended',
@@ -160,6 +185,9 @@ export const mockSchools = [
     course: 'Data Science',
     status: 'active',
     totalStudents: 2000,
+    totalStudentsExpected: 2500,
+    lockedDealAmount: 4500000,
+    lockedDealCurrency: 'INR',
     enrollmentDate: '2024-03-01T00:00:00Z',
     notes: 'Large school with excellent infrastructure. Students very enthusiastic about data science.',
     contactPersonRole: 'Principal',
@@ -167,6 +195,12 @@ export const mockSchools = [
     creationDate: '2024-03-01T00:00:00Z',
     lastEdited: '2024-03-14T11:20:00Z',
     studentGrowth: { '2023': 1800, '2024': 2000 },
+    gradeAllocations: [
+      { grade: 9, students: 300, sections: ['A', 'B', 'C', 'D', 'E'] },
+      { grade: 10, students: 280, sections: ['A', 'B', 'C', 'D'] },
+      { grade: 11, students: 250, sections: ['A', 'B', 'C'] },
+      { grade: 12, students: 220, sections: ['A', 'B'] }
+    ],
     section: [
       {
         status: 'active',
@@ -191,6 +225,9 @@ export const mockSchools = [
     course: 'Web Development',
     status: 'active',
     totalStudents: 1200,
+    totalStudentsExpected: 1500,
+    lockedDealAmount: 2800000,
+    lockedDealCurrency: 'INR',
     enrollmentDate: '2024-02-15T00:00:00Z',
     notes: 'Catholic school with strong emphasis on technology education. Great partnership potential.',
     contactPersonRole: 'Administrator',
@@ -198,6 +235,11 @@ export const mockSchools = [
     creationDate: '2024-02-15T00:00:00Z',
     lastEdited: '2024-03-13T15:30:00Z',
     studentGrowth: { '2023': 1100, '2024': 1200 },
+    gradeAllocations: [
+      { grade: 10, students: 200, sections: ['A', 'B', 'C'] },
+      { grade: 11, students: 180, sections: ['A', 'B'] },
+      { grade: 12, students: 150, sections: ['A'] }
+    ],
     section: [
       {
         status: 'active',
@@ -222,6 +264,9 @@ export const mockSchools = [
     course: 'Mobile App Development',
     status: 'active',
     totalStudents: 800,
+    totalStudentsExpected: 1000,
+    lockedDealAmount: 65000,
+    lockedDealCurrency: 'GBP',
     enrollmentDate: '2024-01-25T00:00:00Z',
     notes: 'International curriculum with focus on practical skills. Students creating innovative mobile apps.',
     contactPersonRole: 'Principal',
@@ -229,6 +274,11 @@ export const mockSchools = [
     creationDate: '2024-01-25T00:00:00Z',
     lastEdited: '2024-03-11T10:45:00Z',
     studentGrowth: { '2023': 750, '2024': 800 },
+    gradeAllocations: [
+      { grade: 9, students: 150, sections: ['A', 'B'] },
+      { grade: 10, students: 180, sections: ['A', 'B', 'C'] },
+      { grade: 11, students: 120, sections: ['A'] }
+    ],
     section: [
       {
         status: 'active',
@@ -253,6 +303,9 @@ export const mockSchools = [
     course: 'AI Bootcamp',
     status: 'inactive',
     totalStudents: 0,
+    totalStudentsExpected: 600,
+    lockedDealAmount: 45000,
+    lockedDealCurrency: 'CAD',
     enrollmentDate: '2024-02-28T00:00:00Z',
     notes: 'School closed temporarily due to administrative changes. Contact maintained for future opportunities.',
     contactPersonRole: 'Administrator',
@@ -260,6 +313,7 @@ export const mockSchools = [
     creationDate: '2024-02-28T00:00:00Z',
     lastEdited: '2024-03-09T13:20:00Z',
     studentGrowth: { '2023': 0, '2024': 0 },
+    gradeAllocations: [],
     section: []
   },
   {
@@ -273,6 +327,9 @@ export const mockSchools = [
     course: 'Robotics 101',
     status: 'active',
     totalStudents: 950,
+    totalStudentsExpected: 1200,
+    lockedDealAmount: 85000,
+    lockedDealCurrency: 'AUD',
     enrollmentDate: '2024-03-05T00:00:00Z',
     notes: 'New partnership showing great promise. Students very engaged with robotics projects.',
     contactPersonRole: 'Principal',
@@ -280,6 +337,11 @@ export const mockSchools = [
     creationDate: '2024-03-05T00:00:00Z',
     lastEdited: '2024-03-15T08:30:00Z',
     studentGrowth: { '2023': 0, '2024': 950 },
+    gradeAllocations: [
+      { grade: 8, students: 120, sections: ['A', 'B'] },
+      { grade: 9, students: 180, sections: ['A', 'B', 'C'] },
+      { grade: 10, students: 200, sections: ['A', 'B', 'C', 'D'] }
+    ],
     section: [
       {
         status: 'active',
@@ -304,6 +366,9 @@ export const mockSchools = [
     course: 'Data Science',
     status: 'active',
     totalStudents: 700,
+    totalStudentsExpected: 900,
+    lockedDealAmount: 55000,
+    lockedDealCurrency: 'EUR',
     enrollmentDate: '2024-02-10T00:00:00Z',
     notes: 'German school with excellent technical infrastructure. Students very analytical and detail-oriented.',
     contactPersonRole: 'Director',
@@ -311,6 +376,11 @@ export const mockSchools = [
     creationDate: '2024-02-10T00:00:00Z',
     lastEdited: '2024-03-12T14:15:00Z',
     studentGrowth: { '2023': 650, '2024': 700 },
+    gradeAllocations: [
+      { grade: 10, students: 150, sections: ['A', 'B'] },
+      { grade: 11, students: 180, sections: ['A', 'B', 'C'] },
+      { grade: 12, students: 120, sections: ['A'] }
+    ],
     section: [
       {
         status: 'active',
@@ -335,6 +405,9 @@ export const mockSchools = [
     course: 'Web Development',
     status: 'active',
     totalStudents: 1100,
+    totalStudentsExpected: 1400,
+    lockedDealAmount: 95000,
+    lockedDealCurrency: 'SGD',
     enrollmentDate: '2024-01-20T00:00:00Z',
     notes: 'High-performing school with excellent student outcomes. Strong focus on practical web development skills.',
     contactPersonRole: 'Principal',
@@ -342,6 +415,12 @@ export const mockSchools = [
     creationDate: '2024-01-20T00:00:00Z',
     lastEdited: '2024-03-14T16:45:00Z',
     studentGrowth: { '2023': 1000, '2024': 1100 },
+    gradeAllocations: [
+      { grade: 9, students: 200, sections: ['A', 'B', 'C'] },
+      { grade: 10, students: 220, sections: ['A', 'B', 'C', 'D'] },
+      { grade: 11, students: 180, sections: ['A', 'B'] },
+      { grade: 12, students: 150, sections: ['A'] }
+    ],
     section: [
       {
         status: 'active',
@@ -366,6 +445,9 @@ export const mockSchools = [
     course: 'AI Bootcamp',
     status: 'active',
     totalStudents: 600,
+    totalStudentsExpected: 800,
+    lockedDealAmount: 220000,
+    lockedDealCurrency: 'AED',
     enrollmentDate: '2024-03-08T00:00:00Z',
     notes: 'Premium school with state-of-the-art facilities. Students very motivated and tech-savvy.',
     contactPersonRole: 'Principal',
@@ -373,6 +455,10 @@ export const mockSchools = [
     creationDate: '2024-03-08T00:00:00Z',
     lastEdited: '2024-03-15T12:00:00Z',
     studentGrowth: { '2023': 0, '2024': 600 },
+    gradeAllocations: [
+      { grade: 11, students: 150, sections: ['A', 'B'] },
+      { grade: 12, students: 120, sections: ['A'] }
+    ],
     section: [
       {
         status: 'active',
@@ -397,6 +483,9 @@ export const mockSchools = [
     course: 'Mobile App Development',
     status: 'suspended',
     totalStudents: 450,
+    totalStudentsExpected: 600,
+    lockedDealAmount: 35000,
+    lockedDealCurrency: 'EUR',
     enrollmentDate: '2024-02-25T00:00:00Z',
     notes: 'Suspended due to curriculum conflicts. Working on resolution with school administration.',
     contactPersonRole: 'Director',
@@ -404,6 +493,10 @@ export const mockSchools = [
     creationDate: '2024-02-25T00:00:00Z',
     lastEdited: '2024-03-07T11:30:00Z',
     studentGrowth: { '2023': 400, '2024': 450 },
+    gradeAllocations: [
+      { grade: 10, students: 120, sections: ['A', 'B'] },
+      { grade: 11, students: 150, sections: ['A', 'B', 'C'] }
+    ],
     section: [
       {
         status: 'suspended',

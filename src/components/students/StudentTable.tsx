@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Eye, Edit, RefreshCw, Users, GraduationCap, BookOpen, Phone, Mail } from 'lucide-react';
 import { Student } from '../../types';
 import { StudentStatusBadge, PaymentStatusBadge, EnrollmentTypeBadge } from './StudentStatusBadge';
+import { LeadTypeBadge } from './LeadTypeBadge';
 
 interface StudentTableProps {
   students: Student[];
@@ -45,10 +46,10 @@ export function StudentTable({ students, onEdit, onView, onReassign }: StudentTa
                 Grade
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider">
-                School
+                Program
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider">
-                Program
+                Lead Type
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider">
                 Status
@@ -97,18 +98,19 @@ export function StudentTable({ students, onEdit, onView, onReassign }: StudentTa
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center text-sm text-[#1E2A3B]">
-                    <GraduationCap className="h-4 w-4 text-[#666] mr-2" />
-                    {student.school || 'Direct Enrollment'}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4 text-[#666]" />
                     <span className="text-sm text-[#1E2A3B]">
                       {student.program || 'Not Assigned'}
                     </span>
                   </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {student.leadType ? (
+                    <LeadTypeBadge leadType={student.leadType} />
+                  ) : (
+                    <span className="text-sm text-[#666]">Not specified</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <StudentStatusBadge 
@@ -196,20 +198,24 @@ export function StudentTable({ students, onEdit, onView, onReassign }: StudentTa
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#666]">School:</span>
-                  <span className="font-medium text-[#1E2A3B]">
-                    {student.school || 'Direct Enrollment'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-[#666]">Program:</span>
                   <span className="font-medium text-[#1E2A3B]">
                     {student.program || 'Not Assigned'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#666]">Type:</span>
-                  <EnrollmentTypeBadge type={student.enrollmentType || 'b2c'} size="sm" />
+                  <span className="text-[#666]">Lead Type:</span>
+                  <div>
+                    {student.leadType ? (
+                      <LeadTypeBadge leadType={student.leadType} />
+                    ) : (
+                      <span className="text-sm text-[#666]">Not specified</span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#666]">Mode:</span>
+                  <EnrollmentTypeBadge type={student.enrollmentType || 'group'} size="sm" />
                 </div>
               </div>
 

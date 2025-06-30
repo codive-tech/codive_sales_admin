@@ -16,8 +16,8 @@ export interface Student {
   studentCountryCode?: string;
   email: string;
   birthday?: string;
+  age?: number;
   country?: string;
-  school: string;
   parentName?: string;
   parentPhone?: string;
   parentCountryCode?: string;
@@ -30,7 +30,8 @@ export interface Student {
   program?: string;
   status?: 'active' | 'completed' | 'dropped';
   paymentStatus?: 'paid' | 'unpaid' | 'pending';
-  enrollmentType?: 'b2b' | 'b2c';
+  enrollmentType?: 'group' | 'one2one';
+  leadType?: 'Referral' | 'WhatsApp' | 'Facebook' | 'Website' | 'Event' | 'School Fair' | 'Other';
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -42,8 +43,8 @@ export interface CreateStudentData {
   studentCountryCode?: string;
   email: string;
   birthday?: string;
+  age?: number;
   country?: string;
-  school: string;
   parentName?: string;
   parentPhone?: string;
   parentCountryCode?: string;
@@ -55,7 +56,8 @@ export interface CreateStudentData {
   classType?: 'group' | 'one2one';
   // New fields for premium student management
   program?: string;
-  enrollmentType?: 'b2b' | 'b2c';
+  enrollmentType?: 'group' | 'one2one';
+  leadType?: 'Referral' | 'WhatsApp' | 'Facebook' | 'Website' | 'Event' | 'School Fair' | 'Other';
   notes?: string;
 }
 
