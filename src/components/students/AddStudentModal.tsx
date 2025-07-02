@@ -61,6 +61,10 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
     program: '',
     enrollmentType: 'group',
     leadType: undefined,
+    status: 'active',
+    paymentStatus: 'unpaid',
+    source: '',
+    campaignId: '',
     notes: ''
   });
 

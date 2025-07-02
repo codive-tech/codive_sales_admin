@@ -27,7 +27,7 @@ export function Login() {
 
   const handleForgotPassword = async ({ email }: { email: string }) => {
     try {
-      await forgotPassword(email);
+    await forgotPassword(email);
     } catch (err) {
       // Error handling is done within the ForgotPasswordCard component
     }

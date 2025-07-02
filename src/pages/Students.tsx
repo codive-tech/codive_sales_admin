@@ -6,7 +6,7 @@ import { AddStudentModal } from '../components/students/AddStudentModal';
 import { EditStudentModal } from '../components/students/EditStudentModal';
 import { StudentProfileModal } from '../components/students/StudentProfileModal';
 import { filterData } from '../utils/filters';
-import { Plus, Users, Download, GraduationCap } from 'lucide-react';
+import { Plus, Users, Download, GraduationCap, RefreshCw } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 // Mock data for students with enhanced fields
@@ -23,6 +23,8 @@ const mockStudents: Student[] = [
     paymentStatus: 'paid',
     enrollmentType: 'group',
     leadType: 'Referral',
+    source: 'Facebook',
+    campaignId: 'SUMMER2024',
     notes: 'Excellent progress in AI fundamentals',
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z'
@@ -39,6 +41,8 @@ const mockStudents: Student[] = [
     paymentStatus: 'unpaid',
     enrollmentType: 'one2one',
     leadType: 'WhatsApp',
+    source: 'WhatsApp',
+    campaignId: 'WHATSAPP_ADS',
     notes: 'Shows great interest in robotics',
     createdAt: '2024-01-20T14:30:00Z',
     updatedAt: '2024-01-20T14:30:00Z'
@@ -55,6 +59,8 @@ const mockStudents: Student[] = [
     paymentStatus: 'paid',
     enrollmentType: 'group',
     leadType: 'Website',
+    source: 'Website',
+    campaignId: 'GOOGLE_ADS',
     notes: 'Completed course successfully',
     createdAt: '2023-12-01T09:15:00Z',
     updatedAt: '2024-01-10T16:45:00Z'
@@ -71,6 +77,8 @@ const mockStudents: Student[] = [
     paymentStatus: 'unpaid',
     enrollmentType: 'one2one',
     leadType: 'Facebook',
+    source: 'Facebook',
+    campaignId: 'FB_CAMPAIGN',
     notes: 'Dropped due to schedule conflicts',
     createdAt: '2024-01-05T11:20:00Z',
     updatedAt: '2024-01-25T13:10:00Z'
@@ -87,6 +95,8 @@ const mockStudents: Student[] = [
     paymentStatus: 'paid',
     enrollmentType: 'group',
     leadType: 'Event',
+    source: 'Event',
+    campaignId: 'EVENT_2024',
     notes: 'Making good progress in web development',
     createdAt: '2024-01-12T15:45:00Z',
     updatedAt: '2024-01-12T15:45:00Z'
@@ -122,8 +132,8 @@ const Students: React.FC = () => {
       const newStudent: Student = {
         id: Date.now().toString(),
         ...studentData,
-        status: 'active',
-        paymentStatus: 'unpaid',
+        status: studentData.status || 'active',
+        paymentStatus: studentData.paymentStatus || 'unpaid',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -186,7 +196,7 @@ const Students: React.FC = () => {
 
   const handleExportCSV = () => {
     const csvContent = [
-      ['Student Name', 'Age', 'Grade', 'Program', 'Lead Type', 'Status', 'Payment Status', 'Email', 'Phone', 'Enrollment Mode'],
+      ['Student Name', 'Age', 'Grade', 'Program', 'Lead Type', 'Status', 'Payment Status', 'Enrollment Status', 'Email', 'Phone', 'Enrollment Mode', 'Source'],
       ...filteredStudents.map(student => [
         student.fullName || '',
         student.age?.toString() || 'N/A',
@@ -195,9 +205,11 @@ const Students: React.FC = () => {
         student.leadType || 'Not specified',
         student.status || '',
         student.paymentStatus || '',
+        student.status || '',
         student.email || '',
         student.phoneNumber || '',
-        student.enrollmentType === 'group' ? 'Group Class' : 'One-to-One Class'
+        student.enrollmentType === 'group' ? 'Group Class' : 'One-to-One Class',
+        student.source || 'N/A'
       ])
     ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
 
@@ -219,6 +231,7 @@ const Students: React.FC = () => {
   const activeStudents = students.filter(s => s.status === 'active').length;
   const completedStudents = students.filter(s => s.status === 'completed').length;
   const unpaidStudents = students.filter(s => s.paymentStatus === 'unpaid').length;
+  const paidStudents = students.filter(s => s.paymentStatus === 'paid').length;
 
   return (
     <div className="space-y-6">
@@ -227,10 +240,10 @@ const Students: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-[#E6F6FB] rounded-lg">
-              <Users className="h-6 w-6 text-[#00AEEF]" />
+              <GraduationCap className="h-6 w-6 text-[#00AEEF]" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#1E2A3B]">Manage Students</h1>
+              <h1 className="text-2xl font-bold text-[#1E2A3B]">Student Management</h1>
               <p className="text-sm text-[#666] mt-1">
                 {filteredStudents.length} of {totalStudents} students
               </p>
@@ -256,7 +269,7 @@ const Students: React.FC = () => {
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-[#E0E0E0]">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6 pt-6 border-t border-[#E0E0E0]">
           <div className="bg-[#E6F6FB] rounded-lg p-4">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-[#00AEEF]" />
@@ -277,6 +290,13 @@ const Students: React.FC = () => {
               <span className="text-sm font-medium text-[#1E2A3B]">Completed</span>
             </div>
             <p className="text-2xl font-bold text-[#00AEEF] mt-1">{completedStudents}</p>
+          </div>
+          <div className="bg-green-50 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-5 rounded-full bg-[#49c57a]"></div>
+              <span className="text-sm font-medium text-[#1E2A3B]">Paid</span>
+            </div>
+            <p className="text-2xl font-bold text-[#49c57a] mt-1">{paidStudents}</p>
           </div>
           <div className="bg-yellow-50 rounded-lg p-4">
             <div className="flex items-center gap-2">

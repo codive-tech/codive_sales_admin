@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Users, AlertTriangle } from 'lucide-react';
 import { GradeCard } from './GradeCard';
 import { RemainingCounter } from './RemainingCounter';
+import { SectionSelector } from './SectionSelector';
 
 export interface GradeAllocation {
   grade: number;
@@ -21,6 +22,8 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
   const [allocations, setAllocations] = useState<GradeAllocation[]>([]);
   const [gradeErrors, setGradeErrors] = useState<Record<number, string>>({});
   const [touched, setTouched] = useState(false);
+  const [expandedGrade, setExpandedGrade] = useState<number | null>(null);
+  const [inputState, setInputState] = useState<{ students: number; sections: string[]; error: string | null }>({ students: 0, sections: [], error: null });
 
   const grades = Array.from({ length: 10 }, (_, i) => i + 1);
 
@@ -48,6 +51,52 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
       }
       return filtered;
     });
+  };
+
+  // When a grade card is expanded, load its state
+  const handleExpand = (grade: number) => {
+    if (expandedGrade === grade) {
+      setExpandedGrade(null);
+      return;
+    }
+    setExpandedGrade(grade);
+    const allocation = allocations.find(a => a.grade === grade);
+    setInputState({
+      students: allocation?.students || 0,
+      sections: allocation?.sections || [],
+      error: null
+    });
+  };
+
+  // Handle input change for expanded grade
+  const handleStudentsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let students = 0;
+    if (value !== '') {
+      const num = Number(value);
+      if (!isNaN(num)) students = num;
+    }
+    // Validate
+    let error = null;
+    const allocation = allocations.find(a => a.grade === expandedGrade);
+    const maxStudents = totalStudentsExpected - (totalAssigned - (allocation?.students || 0));
+    if (students < 0) {
+      error = 'Value must be 0 or more';
+    } else if (students > maxStudents) {
+      error = "You've exceeded the total student limit";
+    }
+    setInputState(prev => ({ ...prev, students, error }));
+  };
+
+  const handleSectionChange = (sections: string[]) => {
+    setInputState(prev => ({ ...prev, sections }));
+  };
+
+  // Save expanded grade changes
+  const handleSave = () => {
+    if (expandedGrade == null) return;
+    handleGradeUpdate(expandedGrade, inputState.students, inputState.sections.length > 0 ? inputState.sections : ['Single Class']);
+    setExpandedGrade(null);
   };
 
   // Sync up to parent
@@ -103,14 +152,94 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
               key={grade}
               grade={grade}
               allocation={allocation}
-              maxStudents={totalStudentsExpected - (totalAssigned - (allocation?.students || 0))}
-              onUpdate={(students, sections) => handleGradeUpdate(grade, students, sections)}
-              recommendedSections={getRecommendedSections(allocation?.students || 0)}
-              error={gradeErrors[grade]}
+              expanded={expandedGrade === grade}
+              onExpand={handleExpand}
             />
           );
         })}
       </div>
+
+      {/* Expanded Content for selected grade */}
+      {expandedGrade !== null && (
+        <div className="mt-4 space-y-4 bg-[#D0F0FA] p-4 rounded-md shadow">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-medium text-[#1E2A3B]">Grade {expandedGrade}</span>
+            <span className="text-xs text-[#00AEEF]">Section & Student Allocation</span>
+          </div>
+          {/* Add a drop down to select the courses*/}
+          <div className="flex items-center gap-2">
+            <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Courses</label>
+            <select className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-[#00AEEF] hover:shadow transition-all h-11">
+              <option value="">Select Course</option>
+              <option value="1">Course 1</option>
+              <option value="2">Course 2</option>
+              <option value="3">Course 3</option>
+            </select>
+          </div>
+          {/* Number of Students */}
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Number of Students <span className="text-[#f55a5a]">*</span></label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min={0}
+                  max={totalStudentsExpected}
+                  value={inputState.students === 0 ? '' : inputState.students}
+                  onChange={handleStudentsChange}
+                  placeholder={`Enter number of students for Grade ${expandedGrade}`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-[#00AEEF] hover:shadow transition-all h-11 ${inputState.error ? 'border-[#f55a5a]' : 'border-[#E0E0E0]'}`}
+                  autoComplete="off"
+                  inputMode="numeric"
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-[#666]">Max: {totalStudentsExpected - (allocations.find(a => a.grade === expandedGrade)?.students || 0) + (inputState.students || 0)}</div>
+              </div>
+              {inputState.error && <p className="text-xs text-[#f55a5a] mt-1">{inputState.error}</p>}
+            </div>
+            {/* Section Selector */}
+            <div>
+              <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Sections</label>
+              <SectionSelector
+                selectedSections={inputState.sections}
+                onSectionChange={handleSectionChange}
+                studentCount={inputState.students}
+                recommendedSections={getRecommendedSections(inputState.students)}
+              />
+            </div>
+          </div>
+          {/* Recommendation */}
+          {inputState.students > 0 && (
+            <div className="text-xs text-[#00AEEF] font-medium mt-2">
+              {(() => {
+                const count = Math.max(1, Math.round(inputState.students / 25));
+                return `Based on ${inputState.students} students, ${count} section${count > 1 ? 's' : ''} recommended (${Math.ceil(inputState.students / count)} each)`;
+              })()}
+            </div>
+          )}
+          {/* Placeholder if no section selected */}
+          {inputState.students > 0 && (!inputState.sections || inputState.sections.length === 0) && (
+            <div className="text-xs text-[#666] italic mt-1">No section selected (Single Class)</div>
+          )}
+          <div className="flex gap-2 mt-4">
+            <button
+              type="button"
+              className="bg-[#00AEEF] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#0095D9] transition-all"
+              onClick={handleSave}
+              disabled={!!inputState.error}
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              className="bg-white border border-[#E0E0E0] text-[#1E2A3B] px-4 py-2 rounded-lg font-medium hover:bg-[#F0F0F0] transition-all"
+              onClick={() => setExpandedGrade(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Summary */}
       {allocations.length > 0 && (

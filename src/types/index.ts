@@ -33,6 +33,11 @@ export interface Student {
   enrollmentType?: 'group' | 'one2one';
   leadType?: 'Referral' | 'WhatsApp' | 'Facebook' | 'Website' | 'Event' | 'School Fair' | 'Other';
   notes?: string;
+  // New fields for CRM pipeline
+  source?: string;
+  campaignId?: string;
+  sellingPrice?: number;
+  convertedFromLead?: string; // Lead ID that was converted
   createdAt: string;
   updatedAt: string;
 }
@@ -59,6 +64,12 @@ export interface CreateStudentData {
   enrollmentType?: 'group' | 'one2one';
   leadType?: 'Referral' | 'WhatsApp' | 'Facebook' | 'Website' | 'Event' | 'School Fair' | 'Other';
   notes?: string;
+  // New fields for CRM pipeline
+  source?: string;
+  campaignId?: string;
+  sellingPrice?: number;
+  status?: 'active' | 'completed' | 'dropped';
+  paymentStatus?: 'paid' | 'unpaid' | 'pending';
 }
 
 // Lead types
@@ -73,6 +84,9 @@ export interface Lead {
   notes?: string;
   status: 'New' | 'Contacted' | 'Follow-Up' | 'Converted' | 'Cold';
   campaignId?: string;
+  // New fields for enhanced CRM
+  sellingPrice?: number;
+  convertedToStudent?: string; // Student ID if converted
   createdAt: string;
   updatedAt: string;
 }
@@ -87,6 +101,17 @@ export interface CreateLeadData {
   notes?: string;
   status: 'New' | 'Contacted' | 'Follow-Up' | 'Converted' | 'Cold';
   campaignId?: string;
+  sellingPrice?: number;
+}
+
+// New interface for converting lead to student
+export interface ConvertLeadData {
+  enrollmentStatus: 'active' | 'completed' | 'dropped';
+  paymentStatus: 'paid' | 'unpaid' | 'pending';
+  sellingPrice?: number;
+  grade: string;
+  age?: number;
+  notes?: string;
 }
 
 export interface LeadNote {
@@ -109,6 +134,14 @@ export interface LeadFilters {
     start: string;
     end: string;
   };
+}
+
+// Import campaign types
+export interface ImportCampaign {
+  id: string;
+  name: string;
+  source: 'Facebook' | 'Google Ads' | 'WhatsApp' | 'Manual';
+  leads: CreateLeadData[];
 }
 
 // Revenue Report Types

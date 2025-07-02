@@ -3,15 +3,23 @@ import { Lead } from '../../types';
 import LeadStatusBadge from './LeadStatusBadge';
 import { leadStatuses } from '../../data/mockData';
 import { WhatsAppButton } from './WhatsAppButton';
+import { GraduationCap, Edit, MessageSquare, CheckCircle, ArrowRight } from 'lucide-react';
 
 interface LeadsTableProps {
   leads: Lead[];
   onStatusChange: (leadId: string, newStatus: Lead['status']) => void;
   onEditLead: (lead: Lead) => void;
   onViewNotes: (lead: Lead) => void;
+  onConvertToStudent: (lead: Lead) => void;
 }
 
-const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLead, onViewNotes }) => {
+const LeadsTable: React.FC<LeadsTableProps> = ({ 
+  leads, 
+  onStatusChange, 
+  onEditLead, 
+  onViewNotes,
+  onConvertToStudent 
+}) => {
   const [editingStatus, setEditingStatus] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
@@ -31,6 +39,19 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
     return type === 'School' 
       ? 'bg-[#00AEEF] text-white' 
       : 'bg-[#D0F0FA] text-[#1E2A3B]';
+  };
+
+  const getSourceBadgeColor = (source: string) => {
+    const colors: Record<string, string> = {
+      'Facebook': 'bg-blue-100 text-blue-800',
+      'Instagram': 'bg-pink-100 text-pink-800',
+      'WhatsApp': 'bg-green-100 text-green-800',
+      'Google Ads': 'bg-red-100 text-red-800',
+      'Event': 'bg-purple-100 text-purple-800',
+      'Referral': 'bg-orange-100 text-orange-800',
+      'Manual': 'bg-gray-100 text-gray-800'
+    };
+    return colors[source] || 'bg-gray-100 text-gray-800';
   };
 
   if (leads.length === 0) {
@@ -69,14 +90,21 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
             {leads.map((lead) => (
               <tr 
                 key={lead.id} 
-                className="hover:bg-[#F8F9FA] transition-colors duration-200"
+                className={`hover:bg-[#F8F9FA] transition-colors duration-200 ${
+                  lead.status === 'Converted' ? 'bg-green-50' : ''
+                }`}
               >
                 <td className="px-6 py-4">
-                  <div>
-                    <div className="font-medium text-[#333333]">{lead.fullName}</div>
-                    {lead.email && (
-                      <div className="text-sm text-gray-500">{lead.email}</div>
+                  <div className="flex items-center gap-3">
+                    {lead.status === 'Converted' && (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
                     )}
+                    <div>
+                      <div className="font-medium text-[#333333]">{lead.fullName}</div>
+                      {lead.email && (
+                        <div className="text-sm text-gray-500">{lead.email}</div>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-4">
@@ -97,7 +125,10 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
                 </td>
                 <td className="px-6 py-4">
                   {lead.campaignId ? (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#D0F0FA] text-[#1E2A3B]">
+                    <span 
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#D0F0FA] text-[#1E2A3B] cursor-help"
+                      title={`Campaign: ${lead.campaignId}`}
+                    >
                       {lead.campaignId}
                     </span>
                   ) : (
@@ -126,30 +157,54 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 text-[#333333]">{lead.source}</td>
+                <td className="px-6 py-4">
+                  <span 
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getSourceBadgeColor(lead.source)} cursor-help`}
+                    title={`Source: ${lead.source}`}
+                  >
+                    {lead.source}
+                  </span>
+                </td>
                 <td className="px-6 py-4 text-[#333333]">{formatDate(lead.createdAt)}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => onViewNotes(lead)}
-                      className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors"
+                      className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors flex items-center gap-1"
+                      title="View Notes"
                     >
-                      View Notes
+                      <MessageSquare className="h-3 w-3" />
+                      Notes
                     </button>
                     <span className="text-gray-300">|</span>
                     <button
                       onClick={() => onEditLead(lead)}
-                      className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors"
+                      className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors flex items-center gap-1"
+                      title="Edit Lead"
                     >
+                      <Edit className="h-3 w-3" />
                       Edit
                     </button>
                     <span className="text-gray-300">|</span>
-                    <button
-                      onClick={() => handleStatusChange(lead.id, 'Converted')}
-                      className="text-[#49c57a] hover:text-[#3da066] text-sm font-medium transition-colors"
-                    >
-                      Convert
-                    </button>
+                    {lead.status === 'Converted' ? (
+                      <button
+                        onClick={() => onConvertToStudent(lead)}
+                        className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors flex items-center gap-1"
+                        title="Push to Students"
+                      >
+                        <GraduationCap className="h-3 w-3" />
+                        Push to Students
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleStatusChange(lead.id, 'Converted')}
+                        className="text-[#49c57a] hover:text-[#3da066] text-sm font-medium transition-colors flex items-center gap-1"
+                        title="Convert Lead"
+                      >
+                        <ArrowRight className="h-3 w-3" />
+                        Convert
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -163,59 +218,76 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onStatusChange, onEditLe
         {leads.map((lead) => (
           <div 
             key={lead.id} 
-            className="p-4 border-b border-[#E0E0E0] hover:bg-[#F8F9FA] transition-colors duration-200"
+            className={`p-4 border-b border-[#E0E0E0] hover:bg-[#F8F9FA] transition-colors duration-200 ${
+              lead.status === 'Converted' ? 'bg-green-50' : ''
+            }`}
           >
             <div className="flex justify-between items-start mb-3">
               <div className="flex-1">
-                <h3 className="font-medium text-[#333333] mb-1">{lead.fullName}</h3>
+                <div className="flex items-center gap-2 mb-1">
+                  {lead.status === 'Converted' && (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  )}
+                  <h3 className="font-medium text-[#333333]">{lead.fullName}</h3>
+                </div>
                 <div className="flex items-center space-x-2 mb-2">
                   <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTypeBadgeColor(lead.leadType)}`}>
                     {lead.leadType}
                   </span>
                   <LeadStatusBadge status={lead.status} />
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getSourceBadgeColor(lead.source)}`}>
+                    {lead.source}
+                  </span>
                   {lead.campaignId && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#D0F0FA] text-[#1E2A3B]">
                       {lead.campaignId}
                     </span>
                   )}
                 </div>
+                <div className="text-sm text-gray-600 mb-2">
+                  <div>Program: {lead.programOfInterest}</div>
+                  <div>Contact: {lead.contactNumber}</div>
+                  {lead.email && <div>Email: {lead.email}</div>}
+                  <div>Created: {formatDate(lead.createdAt)}</div>
+                </div>
               </div>
-              <div className="flex space-x-2">
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex space-x-3">
                 <button
                   onClick={() => onViewNotes(lead)}
-                  className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors"
+                  className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors flex items-center gap-1"
                 >
+                  <MessageSquare className="h-3 w-3" />
                   Notes
                 </button>
                 <button
                   onClick={() => onEditLead(lead)}
-                  className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors"
+                  className="text-[#00AEEF] hover:text-[#0095D9] text-sm font-medium transition-colors flex items-center gap-1"
                 >
+                  <Edit className="h-3 w-3" />
                   Edit
                 </button>
-                <button
-                  onClick={() => handleStatusChange(lead.id, 'Converted')}
-                  className="text-[#49c57a] hover:text-[#3da066] text-sm font-medium transition-colors"
-                >
-                  Convert
-                </button>
               </div>
-            </div>
-            
-            <div className="space-y-1 text-sm text-[#333333]">
-              <div><span className="font-medium">Program:</span> {lead.programOfInterest}</div>
-              <div className="flex items-center space-x-2">
-                <span className="font-medium">Contact:</span> 
-                <span>{lead.contactNumber}</span>
-                <WhatsAppButton
-                  phoneNumber={lead.contactNumber}
-                  leadName={lead.fullName}
-                  programOfInterest={lead.programOfInterest}
-                />
+              <div>
+                {lead.status === 'Converted' ? (
+                  <button
+                    onClick={() => onConvertToStudent(lead)}
+                    className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors flex items-center gap-1"
+                  >
+                    <GraduationCap className="h-3 w-3" />
+                    Push to Students
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleStatusChange(lead.id, 'Converted')}
+                    className="text-[#49c57a] hover:text-[#3da066] text-sm font-medium transition-colors flex items-center gap-1"
+                  >
+                    <ArrowRight className="h-3 w-3" />
+                    Convert
+                  </button>
+                )}
               </div>
-              {lead.email && <div><span className="font-medium">Email:</span> {lead.email}</div>}
-              <div><span className="font-medium">Source:</span> {lead.source}</div>
-              <div><span className="font-medium">Created:</span> {formatDate(lead.createdAt)}</div>
             </div>
           </div>
         ))}
