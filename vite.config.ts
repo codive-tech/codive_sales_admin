@@ -12,6 +12,6 @@ export default defineConfig({
   },
   
   preview: {
-    allowedHosts: ['students.codive.co'],
+    allowedHosts: ['sales.admin.codive.co'],
   },
 });
