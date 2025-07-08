@@ -1,6 +1,7 @@
 import React from 'react';
 import { Download } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { PaymentVerification } from '../../types';
 
 // Brand colors
 const colors = {
@@ -8,23 +9,8 @@ const colors = {
   hoverBlue: '#0095D9'
 };
 
-interface Payment {
-  id: string;
-  name: string;
-  courseTitle: string;
-  amount: number;
-  discount?: number;
-  finalAmount: number;
-  status: 'paid' | 'pending' | 'expired';
-  razorpayLink?: string;
-  dateCreated: string;
-  paymentDate?: string;
-  expiryDate: string;
-  type: 'student' | 'school';
-}
-
 interface ExportPaymentsProps {
-  payments: Payment[];
+  payments: PaymentVerification[];
   courseType?: string;
 }
 
@@ -37,32 +23,34 @@ export const ExportPayments: React.FC<ExportPaymentsProps> = ({ payments, course
 
     // Define CSV headers
     const headers = [
-      'Name',
-      'Program',
+      'Payment ID',
+      'School ID',
+      'Student ID',
+      'Course Title',
       'Amount',
-      'Discount',
-      'Final Amount',
+      'Partial Amount',
       'Status',
-      'Razorpay ID',
+      'Verification Status',
+      'Course Assigned',
+      'Payment Notes',
       'Created Date',
-      'Payment Date',
-      'Expiry Date',
-      'Type'
+      'Updated Date'
     ];
 
     // Convert payments to CSV rows
     const csvRows = payments.map(payment => [
-      payment.name,
+      payment.paymentIdGenerated,
+      payment.schoolId,
+      payment.studentId || '',
       payment.courseTitle,
       payment.amount.toString(),
-      payment.discount?.toString() || '0',
-      payment.finalAmount.toString(),
+      payment.partialAmount?.toString() || '',
       payment.status,
-      payment.razorpayLink?.split('/').pop() || '',
+      payment.isVerified ? 'Verified' : 'Not Verified',
+      payment.assignedCourse ? 'Yes' : 'No',
+      payment.paymentNotes || '',
       new Date(payment.dateCreated).toLocaleDateString('en-IN'),
-      payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString('en-IN') : '',
-      new Date(payment.expiryDate).toLocaleDateString('en-IN'),
-      payment.type
+      new Date(payment.dateUpdated).toLocaleDateString('en-IN')
     ]);
 
     // Combine headers and rows
@@ -76,7 +64,7 @@ export const ExportPayments: React.FC<ExportPaymentsProps> = ({ payments, course
     const url = URL.createObjectURL(blob);
     
     const timestamp = new Date().toISOString().split('T')[0];
-    const filename = `codive-payments-${courseType || 'all'}-${timestamp}.csv`;
+    const filename = `codive-payment-verifications-${courseType || 'all'}-${timestamp}.csv`;
     
     link.setAttribute('href', url);
     link.setAttribute('download', filename);
@@ -85,7 +73,7 @@ export const ExportPayments: React.FC<ExportPaymentsProps> = ({ payments, course
     link.click();
     document.body.removeChild(link);
 
-    toast.success('Payment report exported successfully!');
+    toast.success('Payment verification report exported successfully!');
   };
 
   return (

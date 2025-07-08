@@ -8,11 +8,13 @@ import { StudentProfileModal } from '../components/students/StudentProfileModal'
 import { filterData } from '../utils/filters';
 import { Plus, Users, Download, GraduationCap, RefreshCw } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { generateStudentId, MOCK_SCHOOL_ID } from '../utils/studentUtils';
 
-// Mock data for students with enhanced fields
+// Mock data for students with enhanced fields and student IDs
 const mockStudents: Student[] = [
   {
     id: '1',
+    studentId: 'STU-412-G8-1234',
     fullName: 'Aarav Sharma',
     phoneNumber: '9876543210',
     email: 'aarav.sharma@email.com',
@@ -23,14 +25,13 @@ const mockStudents: Student[] = [
     paymentStatus: 'paid',
     enrollmentType: 'group',
     leadType: 'Referral',
-    source: 'Facebook',
-    campaignId: 'SUMMER2024',
     notes: 'Excellent progress in AI fundamentals',
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z'
   },
   {
     id: '2',
+    studentId: 'STU-412-G10-5678',
     fullName: 'Zara Patel',
     phoneNumber: '8765432109',
     email: 'zara.patel@email.com',
@@ -41,14 +42,13 @@ const mockStudents: Student[] = [
     paymentStatus: 'unpaid',
     enrollmentType: 'one2one',
     leadType: 'WhatsApp',
-    source: 'WhatsApp',
-    campaignId: 'WHATSAPP_ADS',
     notes: 'Shows great interest in robotics',
     createdAt: '2024-01-20T14:30:00Z',
     updatedAt: '2024-01-20T14:30:00Z'
   },
   {
     id: '3',
+    studentId: 'STU-412-G6-9012',
     fullName: 'Rohan Kumar',
     phoneNumber: '7654321098',
     email: 'rohan.kumar@email.com',
@@ -59,14 +59,13 @@ const mockStudents: Student[] = [
     paymentStatus: 'paid',
     enrollmentType: 'group',
     leadType: 'Website',
-    source: 'Website',
-    campaignId: 'GOOGLE_ADS',
     notes: 'Completed course successfully',
     createdAt: '2023-12-01T09:15:00Z',
     updatedAt: '2024-01-10T16:45:00Z'
   },
   {
     id: '4',
+    studentId: 'STU-412-G9-3456',
     fullName: 'Ananya Singh',
     phoneNumber: '6543210987',
     email: 'ananya.singh@email.com',
@@ -77,14 +76,13 @@ const mockStudents: Student[] = [
     paymentStatus: 'unpaid',
     enrollmentType: 'one2one',
     leadType: 'Facebook',
-    source: 'Facebook',
-    campaignId: 'FB_CAMPAIGN',
     notes: 'Dropped due to schedule conflicts',
     createdAt: '2024-01-05T11:20:00Z',
     updatedAt: '2024-01-25T13:10:00Z'
   },
   {
     id: '5',
+    studentId: 'STU-412-G7-7890',
     fullName: 'Vihaan Reddy',
     phoneNumber: '5432109876',
     email: 'vihaan.reddy@email.com',
@@ -95,8 +93,6 @@ const mockStudents: Student[] = [
     paymentStatus: 'paid',
     enrollmentType: 'group',
     leadType: 'Event',
-    source: 'Event',
-    campaignId: 'EVENT_2024',
     notes: 'Making good progress in web development',
     createdAt: '2024-01-12T15:45:00Z',
     updatedAt: '2024-01-12T15:45:00Z'
@@ -129,8 +125,12 @@ const Students: React.FC = () => {
   const handleAddStudent = async (studentData: CreateStudentData) => {
     setIsLoading(true);
     try {
+      // Generate student ID
+      const studentId = generateStudentId(MOCK_SCHOOL_ID, studentData.grade);
+      
       const newStudent: Student = {
         id: Date.now().toString(),
+        studentId,
         ...studentData,
         status: studentData.status || 'active',
         paymentStatus: studentData.paymentStatus || 'unpaid',
@@ -140,7 +140,7 @@ const Students: React.FC = () => {
       
       setStudents([...students, newStudent]);
       setShowAddModal(false);
-      toast.success('Student enrolled successfully!');
+      toast.success(`Student ${studentData.fullName} enrolled successfully with ID: ${studentId}`);
     } catch (error) {
       console.error('Error enrolling student:', error);
       toast.error('Failed to enroll student. Please try again.');
@@ -168,7 +168,7 @@ const Students: React.FC = () => {
       setStudents(students.map(s => s.id === selectedStudent.id ? updatedStudent : s));
       setShowEditModal(false);
       setSelectedStudent(undefined);
-      toast.success('Student updated successfully!');
+      toast.success(`Student ${studentData.fullName} updated successfully!`);
     } catch (error) {
       console.error('Error updating student:', error);
       toast.error('Failed to update student. Please try again.');
@@ -196,8 +196,9 @@ const Students: React.FC = () => {
 
   const handleExportCSV = () => {
     const csvContent = [
-      ['Student Name', 'Age', 'Grade', 'Program', 'Lead Type', 'Status', 'Payment Status', 'Enrollment Status', 'Email', 'Phone', 'Enrollment Mode', 'Source'],
+      ['Student ID', 'Student Name', 'Age', 'Grade', 'Program', 'Lead Type', 'Status', 'Payment Status', 'Enrollment Status', 'Email', 'Phone', 'Enrollment Mode'],
       ...filteredStudents.map(student => [
+        student.studentId || 'N/A',
         student.fullName || '',
         student.age?.toString() || 'N/A',
         `Grade ${student.grade || 'N/A'}`,
@@ -208,8 +209,7 @@ const Students: React.FC = () => {
         student.status || '',
         student.email || '',
         student.phoneNumber || '',
-        student.enrollmentType === 'group' ? 'Group Class' : 'One-to-One Class',
-        student.source || 'N/A'
+        student.enrollmentType === 'group' ? 'Group Class' : 'One-to-One Class'
       ])
     ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
 

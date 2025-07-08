@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Phone, Mail, GraduationCap, BookOpen, Building, FileText, Edit, RefreshCw } from 'lucide-react';
+import { X, User, Phone, Mail, GraduationCap, BookOpen, Building, FileText, Edit, RefreshCw, Hash } from 'lucide-react';
 import { Student, CreateStudentData } from '../../types';
 import { StudentStatusBadge, PaymentStatusBadge, EnrollmentTypeBadge } from './StudentStatusBadge';
 
@@ -70,11 +70,11 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
     program: '',
     enrollmentType: 'group',
     leadType: undefined,
+    status: 'active',
+    paymentStatus: 'unpaid',
     notes: ''
   });
 
-  const [status, setStatus] = useState<'active' | 'completed' | 'dropped'>('active');
-  const [paymentStatus, setPaymentStatus] = useState<'paid' | 'unpaid' | 'pending'>('unpaid');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Populate form when student data changes
@@ -89,10 +89,10 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
         program: student.program || '',
         enrollmentType: student.enrollmentType || 'group',
         leadType: student.leadType,
+        status: student.status || 'active',
+        paymentStatus: student.paymentStatus || 'unpaid',
         notes: student.notes || ''
       });
-      setStatus(student.status || 'active');
-      setPaymentStatus(student.paymentStatus || 'unpaid');
     }
   }, [student]);
 
@@ -137,13 +137,7 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
     e.preventDefault();
     
     if (validateForm()) {
-      // Include status and payment status in the submission
-      const submissionData = {
-        ...formData,
-        status,
-        paymentStatus
-      };
-      onSubmit(submissionData);
+      onSubmit(formData);
     }
   };
 
@@ -166,10 +160,10 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
       program: '',
       enrollmentType: 'group',
       leadType: undefined,
+      status: 'active',
+      paymentStatus: 'unpaid',
       notes: ''
     });
-    setStatus('active');
-    setPaymentStatus('unpaid');
     setErrors({});
     onClose();
   };
@@ -202,20 +196,24 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
           </button>
         </div>
 
-        {/* Current Status Display */}
-        {student && (
-          <div className="p-6 bg-gray-50 border-b border-[#E0E0E0]">
-            <h3 className="text-sm font-medium text-[#1E2A3B] mb-3">Current Status</h3>
-            <div className="flex items-center gap-4">
-              <StudentStatusBadge status={student.status || 'active'} size="md" />
-              <PaymentStatusBadge status={student.paymentStatus || 'unpaid'} size="md" />
-              <EnrollmentTypeBadge type={student.enrollmentType || 'group'} size="md" />
-            </div>
-          </div>
-        )}
-
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Student ID Display */}
+          {student?.studentId && (
+            <div className="bg-[#E6F6FB] rounded-lg p-4 border border-[#00AEEF]">
+              <div className="flex items-center gap-2">
+                <Hash className="h-4 w-4 text-[#00AEEF]" />
+                <span className="text-sm font-medium text-[#1E2A3B]">Student ID:</span>
+                <span className="text-sm font-mono text-[#00AEEF] bg-white px-2 py-1 rounded border">
+                  {student.studentId}
+                </span>
+              </div>
+              <p className="text-xs text-[#666] mt-1">
+                This ID cannot be changed
+              </p>
+            </div>
+          )}
+
           {/* Student Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
@@ -417,21 +415,21 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
             </div>
           </div>
 
-          {/* Status Management */}
+          {/* Status Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Status Management
+              <Building className="h-4 w-4" />
+              Status Information
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
-                  Enrollment Status
+                  Enrollment Status *
                 </label>
                 <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as 'active' | 'completed' | 'dropped')}
+                  value={formData.status}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
                   className="w-full px-3 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
                 >
                   {statusOptions.map(status => (
@@ -444,16 +442,16 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
 
               <div>
                 <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
-                  Payment Status
+                  Payment Status *
                 </label>
                 <select
-                  value={paymentStatus}
-                  onChange={(e) => setPaymentStatus(e.target.value as 'paid' | 'unpaid' | 'pending')}
+                  value={formData.paymentStatus}
+                  onChange={(e) => handleInputChange('paymentStatus', e.target.value)}
                   className="w-full px-3 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
                 >
-                  {paymentStatusOptions.map(status => (
-                    <option key={status.value} value={status.value}>
-                      {status.label}
+                  {paymentStatusOptions.map(paymentStatus => (
+                    <option key={paymentStatus.value} value={paymentStatus.value}>
+                      {paymentStatus.label}
                     </option>
                   ))}
                 </select>
@@ -503,4 +501,6 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
       </div>
     </div>
   );
-} 
+}
+
+export default EditStudentModal; 

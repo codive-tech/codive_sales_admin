@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, User, Phone, Mail, GraduationCap, BookOpen, Building, FileText, Plus } from 'lucide-react';
+import { X, User, Phone, Mail, GraduationCap, BookOpen, Building, FileText, Plus, Hash } from 'lucide-react';
 import { CreateStudentData } from '../../types';
+import { generateStudentId, MOCK_SCHOOL_ID } from '../../utils/studentUtils';
 import Input from '../../basic_components/Input';
 import CountrySelect from '../CountrySelect';
 import GradeSelect from '../GradeSelect';
@@ -51,6 +52,18 @@ const leadTypes = [
   { label: 'Other', value: 'Other' }
 ];
 
+const statusOptions = [
+  { label: 'Active', value: 'active' },
+  { label: 'Completed', value: 'completed' },
+  { label: 'Dropped', value: 'dropped' }
+];
+
+const paymentStatusOptions = [
+  { label: 'Paid', value: 'paid' },
+  { label: 'Unpaid', value: 'unpaid' },
+  { label: 'Pending', value: 'pending' }
+];
+
 export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }: AddStudentModalProps) {
   const [formData, setFormData] = useState<CreateStudentData>({
     fullName: '',
@@ -63,12 +76,13 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
     leadType: undefined,
     status: 'active',
     paymentStatus: 'unpaid',
-    source: '',
-    campaignId: '',
     notes: ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Generate student ID when grade changes
+  const studentId = formData.grade ? generateStudentId(MOCK_SCHOOL_ID, formData.grade) : '';
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -134,6 +148,8 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
       program: '',
       enrollmentType: 'group',
       leadType: undefined,
+      status: 'active',
+      paymentStatus: 'unpaid',
       notes: ''
     });
     setErrors({});
@@ -170,6 +186,22 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Student ID Display */}
+          {studentId && (
+            <div className="bg-[#E6F6FB] rounded-lg p-4 border border-[#00AEEF]">
+              <div className="flex items-center gap-2">
+                <Hash className="h-4 w-4 text-[#00AEEF]" />
+                <span className="text-sm font-medium text-[#1E2A3B]">Student ID:</span>
+                <span className="text-sm font-mono text-[#00AEEF] bg-white px-2 py-1 rounded border">
+                  {studentId}
+                </span>
+              </div>
+              <p className="text-xs text-[#666] mt-1">
+                This ID will be automatically generated and cannot be changed
+              </p>
+            </div>
+          )}
+
           {/* Student Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
@@ -367,6 +399,50 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
                   />
                   <span className="text-sm text-[#1E2A3B]">One-to-One Class</span>
                 </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
+              <Building className="h-4 w-4" />
+              Status Information
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                  Enrollment Status *
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+                >
+                  {statusOptions.map(status => (
+                    <option key={status.value} value={status.value}>
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                  Payment Status *
+                </label>
+                <select
+                  value={formData.paymentStatus}
+                  onChange={(e) => handleInputChange('paymentStatus', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+                >
+                  {paymentStatusOptions.map(paymentStatus => (
+                    <option key={paymentStatus.value} value={paymentStatus.value}>
+                      {paymentStatus.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
