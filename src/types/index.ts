@@ -9,8 +9,36 @@ export interface Payment {
   paymentLink?: string;
 }
 
+// Enhanced Payment Verification Types
+export interface PaymentVerification {
+  id: string;
+  paymentId: string;
+  schoolId: string;
+  studentId: string;
+  status: 'paid' | 'partial' | 'pending';
+  amount: number;
+  partialAmount?: number;
+  courseTitle: string;
+  paymentNotes?: string;
+  receiptFile?: File;
+  proofImage?: File;
+  isVerified: boolean;
+  paymentIdGenerated: string;
+  dateCreated: string;
+  dateUpdated: string;
+  assignedCourse?: boolean;
+}
+
+export interface PaymentVerificationForm {
+  status: 'paid' | 'partial' | 'pending';
+  paymentNotes: string;
+  receiptFile?: File;
+  proofImage?: File;
+}
+
 export interface Student {
   id: string;
+  studentId: string; // Auto-generated student ID
   fullName: string;
   phoneNumber: string;
   studentCountryCode?: string;
@@ -34,7 +62,6 @@ export interface Student {
   leadType?: 'Referral' | 'WhatsApp' | 'Facebook' | 'Website' | 'Event' | 'School Fair' | 'Other';
   notes?: string;
   // New fields for CRM pipeline
-  source?: string;
   campaignId?: string;
   sellingPrice?: number;
   convertedFromLead?: string; // Lead ID that was converted
@@ -65,7 +92,6 @@ export interface CreateStudentData {
   leadType?: 'Referral' | 'WhatsApp' | 'Facebook' | 'Website' | 'Event' | 'School Fair' | 'Other';
   notes?: string;
   // New fields for CRM pipeline
-  source?: string;
   campaignId?: string;
   sellingPrice?: number;
   status?: 'active' | 'completed' | 'dropped';
