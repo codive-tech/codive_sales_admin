@@ -5,13 +5,10 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   preview: {
     port: 4174,
+    allowedHosts: ['sales.admin.codive.co', 'partner.codive.co', 'www.partner.codive.co']
   },
   plugins: [react()],
   optimizeDeps: {
     exclude: ['lucide-react'],
-  },
-  
-  preview: {
-    allowedHosts: ['sales.admin.codive.co', 'partner.codive.co'],
   },
 });
