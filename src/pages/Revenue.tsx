@@ -28,27 +28,27 @@ const Revenue = () => {
     let filtered = mockRevenueData;
 
     // Filter by date range
-    filtered = filtered.filter(record => {
-      const recordDate = new Date(record.date);
-      const startDate = new Date(filters.dateRange.start);
-      const endDate = new Date(filters.dateRange.end);
-      return recordDate >= startDate && recordDate <= endDate;
-    });
+    // filtered = filtered.filter(record => {
+    //   const recordDate = new Date(record.date);
+    //   const startDate = new Date(filters.dateRange.start);
+    //   const endDate = new Date(filters.dateRange.end);
+    //   return recordDate >= startDate && recordDate <= endDate;
+    // });
 
-    // Filter by lead type
-    if (filters.leadType) {
-      filtered = filtered.filter(record => record.leadType === filters.leadType);
-    }
+    // // Filter by lead type
+    // if (filters.leadType) {
+    //   filtered = filtered.filter(record => record.leadType === filters.leadType);
+    // }
 
-    // Filter by program
-    if (filters.program) {
-      filtered = filtered.filter(record => record.program === filters.program);
-    }
+    // // Filter by program
+    // if (filters.program) {
+    //   filtered = filtered.filter(record => record.program === filters.program);
+    // }
 
-    // Filter by status
-    if (filters.status) {
-      filtered = filtered.filter(record => record.paymentStatus === filters.status);
-    }
+    // // Filter by status
+    // if (filters.status) {
+    //   filtered = filtered.filter(record => record.paymentStatus === filters.status);
+    // }
 
     setFilteredData(filtered);
   }, [filters]);

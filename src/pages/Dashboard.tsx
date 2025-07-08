@@ -54,23 +54,22 @@ const colors = {
 // Mock data
 const mockData = {
   partnerName: "St. Xavier's School",
-  totalSchools: 1247,
-  totalStudents: 89432,
-  revenueGenerated: 2847500,
-  revenueChange: 12.5,
-  activeLinks: 156,
-  pendingLinks: 23,
-  expiredLinks: 8,
-  monthlyRevenue: [1850000, 2100000, 1950000, 2400000, 2650000, 2847500],
-  monthlyEnrollments: [1250, 1380, 1420, 1580, 1720, 1890],
-  activities: [
-    { id: 1, type: 'school', message: 'Delhi Public School added 45 students', time: '2 hours ago', status: 'success' },
-    { id: 2, type: 'payment', message: 'Payment link sent to St. Mary\'s Convent', time: '4 hours ago', status: 'pending' },
-    { id: 3, type: 'enrollment', message: 'Kendriya Vidyalaya enrolled 23 new students', time: '6 hours ago', status: 'success' },
-    { id: 4, type: 'payment', message: 'Payment received from Modern School', time: '1 day ago', status: 'success' },
-    { id: 5, type: 'school', message: 'New school onboarding: Sacred Heart Academy', time: '1 day ago', status: 'pending' },
-    { id: 6, type: 'enrollment', message: 'Army Public School added 67 students', time: '2 days ago', status: 'success' }
-  ]
+  totalSchools: 0,
+  totalStudents: 0,
+  revenueGenerated: 0,
+  revenueChange: 0,
+  activeLinks: 0,
+  pendingLinks: 0,
+  expiredLinks: 0,
+  monthlyRevenue: [0,0,0,0,0,0],
+  monthlyEnrollments: [0,0,0,0,0,0],
+  activities: [] as Array<{
+    id: number;
+    type: string;
+    message: string;
+    time: string;
+    status: string;
+  }>
 };
 
 // Animated Counter Component
@@ -112,7 +111,7 @@ const SummaryCard = ({
   value: number;
   subtitle: string;
   icon: React.ElementType;
-  change?: number;
+  change?: number | null;
   changeType?: 'positive' | 'negative' | 'neutral';
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -147,7 +146,7 @@ const SummaryCard = ({
                 changeType === 'negative' ? 'text-red-600' : 'text-gray-600'
               }`}
             >
-              {change > 0 ? '+' : ''}{change}%
+              {change ? (change > 0 ? '+' : '') + change + '%' : ''}
             </span>
           </div>
         )}
@@ -329,33 +328,39 @@ const ActivityFeed = () => {
       </div>
       
       <div className="space-y-4">
-        {mockData.activities.map((activity) => (
-          <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-            <div 
-              className="p-2 rounded-full mt-1"
-              style={{ backgroundColor: colors.accentLightBlue }}
-            >
-              <div style={{ color: getStatusColor(activity.status) }}>
-                {getActivityIcon(activity.type)}
-              </div>
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 mb-1">
-                {activity.message}
-              </p>
-              <div className="flex items-center space-x-2 text-xs text-gray-500">
-                <Clock size={12} />
-                <span>{activity.time}</span>
-              </div>
-            </div>
-            
-            <div 
-              className="w-2 h-2 rounded-full mt-2"
-              style={{ backgroundColor: getStatusColor(activity.status) }}
-            />
+        {mockData.activities.length < 1 ? (
+          <div className="flex items-center justify-center p-8 text-gray-500">
+            <p>No activities found</p>
           </div>
-        ))}
+        ) : (
+          mockData.activities.map((activity) => (
+            <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+              <div 
+                className="p-2 rounded-full mt-1"
+                style={{ backgroundColor: colors.accentLightBlue }}
+              >
+                <div style={{ color: getStatusColor(activity.status) }}>
+                  {getActivityIcon(activity.type)}
+                </div>
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 mb-1">
+                  {activity.message}
+                </p>
+                <div className="flex items-center space-x-2 text-xs text-gray-500">
+                  <Clock size={12} />
+                  <span>{activity.time}</span>
+                </div>
+              </div>
+              
+              <div 
+                className="w-2 h-2 rounded-full mt-2"
+                style={{ backgroundColor: getStatusColor(activity.status) }}
+              />
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -412,7 +417,7 @@ export function Dashboard() {
             value={mockData.totalSchools}
             subtitle="Schools onboarded"
             icon={Building2}
-            change={8.2}
+            change={null}
             changeType="positive"
           />
           <SummaryCard
@@ -420,7 +425,7 @@ export function Dashboard() {
             value={mockData.totalStudents}
             subtitle="Students enrolled"
             icon={Users}
-            change={15.7}
+            change={null}
             changeType="positive"
           />
           <SummaryCard
@@ -428,7 +433,7 @@ export function Dashboard() {
             value={mockData.revenueGenerated}
             subtitle="Total revenue this year"
             icon={IndianRupee}
-            change={mockData.revenueChange}
+            change={null}
             changeType="positive"
           />
           <SummaryCard
@@ -436,7 +441,7 @@ export function Dashboard() {
             value={mockData.activeLinks}
             subtitle={`${mockData.pendingLinks} pending, ${mockData.expiredLinks} expired`}
             icon={Link}
-            change={-2.1}
+            change={null}
             changeType="negative"
           />
         </div>

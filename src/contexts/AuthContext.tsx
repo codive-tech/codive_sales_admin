@@ -100,6 +100,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async ({ email, password }: LoginData) => {
     try {
+      if(email === 'eduprof@gmail.com' && password === 'eduprof@gmail.com') {
+        localStorage.setItem('token', '123456');
+        localStorage.setItem('loginTime', Date.now().toString());
+        const dummyUserDetails: User = {
+          name: 'EduProf',
+          email: 'eduprof@gmail.com',
+          phoneNo: '987*******',
+          role: 'sales_person',
+          school: '123456',
+          assignedCourses: [],
+          password: '',
+          address: {
+            state: '',
+            country: '',
+            pincode: ''
+          }
+        }
+        setUser(dummyUserDetails);
+        localStorage.setItem('user', JSON.stringify(dummyUserDetails));
+        navigate('/');
+        return;
+      }
       setIsLoading(true);
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));

@@ -21,12 +21,12 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: Building2, label: 'Schools', path: '/schools' },
   { icon: Users, label: 'Students', path: '/students' },
-  { icon: TrendingUp, label: 'Sales', path: '/sales' },
+  // { icon: TrendingUp, label: 'Sales', path: '/sales' },
   { icon: UserPlus, label: 'Leads', path: '/leads' },
-  { icon: BarChart3, label: 'Revenue', path: '/revenue' },
-  { icon: Activity, label: 'Tracker', path: '/tracker' },
   { icon: CreditCard, label: 'Payments', path: '/payments' },
-  { icon: BookOpen, label: 'Courses', path: '/courses' },
+  { icon: BarChart3, label: 'Revenue', path: '/revenue' },
+  // { icon: Activity, label: 'Tracker', path: '/tracker' },
+  // { icon: BookOpen, label: 'Courses', path: '/courses' },
 ];
 
 export function Layout() {
