@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Brain, Code, Database, Globe, Smartphone } from 'lucide-react';
+import { Brain, Bot, Code, Banknote, Globe, GraduationCap, BookOpen, Laptop } from 'lucide-react';
 
 interface SchoolTagProps {
   program: string;
@@ -13,42 +13,77 @@ export function SchoolTag({ program, className = '' }: SchoolTagProps) {
       textColor: 'text-purple-800',
       borderColor: 'border-purple-200',
       icon: Brain,
-      description: 'Artificial Intelligence & Machine Learning'
+      description: 'Artificial Intelligence & Machine Learning',
     },
-    'Robotics 101': {
+    'Robotics Junior': {
       bgColor: 'bg-blue-100',
       textColor: 'text-blue-800',
       borderColor: 'border-blue-200',
-      icon: Brain,
-      description: 'Robotics & Automation'
+      icon: Bot,
+      description: 'Hands-on robotics for young minds',
     },
-    'Coding Fundamentals': {
+    'Robotics Senior': {
+      bgColor: 'bg-blue-200',
+      textColor: 'text-blue-900',
+      borderColor: 'border-blue-300',
+      icon: Bot,
+      description: 'Advanced robotics & automation concepts',
+    },
+    'Coding Explorer': {
       bgColor: 'bg-green-100',
       textColor: 'text-green-800',
       borderColor: 'border-green-200',
       icon: Code,
-      description: 'Basic Programming Concepts'
+      description: 'Early-stage logic & coding exposure',
     },
-    'Data Science': {
-      bgColor: 'bg-orange-100',
-      textColor: 'text-orange-800',
-      borderColor: 'border-orange-200',
-      icon: Database,
-      description: 'Data Analysis & Visualization'
+    'Coding Challenger': {
+      bgColor: 'bg-green-200',
+      textColor: 'text-green-900',
+      borderColor: 'border-green-300',
+      icon: Code,
+      description: 'Problem-solving through interactive coding',
     },
-    'Web Development': {
+    'Coding Innovator': {
+      bgColor: 'bg-green-300',
+      textColor: 'text-green-900',
+      borderColor: 'border-green-400',
+      icon: Code,
+      description: 'Creative apps, games & project building',
+    },
+    'Coding Early Level': {
+      bgColor: 'bg-emerald-100',
+      textColor: 'text-emerald-800',
+      borderColor: 'border-emerald-200',
+      icon: Code,
+      description: 'Block-based coding and logic games',
+    },
+    'Complete Java': {
+      bgColor: 'bg-yellow-100',
+      textColor: 'text-yellow-800',
+      borderColor: 'border-yellow-200',
+      icon: Laptop,
+      description: 'Object-Oriented Programming with Java',
+    },
+    'Web-development': {
       bgColor: 'bg-indigo-100',
       textColor: 'text-indigo-800',
       borderColor: 'border-indigo-200',
       icon: Globe,
-      description: 'Frontend & Backend Development'
+      description: 'Frontend & Backend Web Projects',
     },
-    'Mobile App Development': {
-      bgColor: 'bg-pink-100',
-      textColor: 'text-pink-800',
-      borderColor: 'border-pink-200',
-      icon: Smartphone,
-      description: 'iOS & Android Development'
+    'Financial Literacy': {
+      bgColor: 'bg-orange-100',
+      textColor: 'text-orange-800',
+      borderColor: 'border-orange-200',
+      icon: Banknote,
+      description: 'Money management & financial skills',
+    },
+    'Coding Mastery': {
+      bgColor: 'bg-red-100',
+      textColor: 'text-red-800',
+      borderColor: 'border-red-200',
+      icon: GraduationCap,
+      description: 'Capstone-level real-world coding skills',
     },
     'Not Assigned': {
       bgColor: 'bg-gray-100',

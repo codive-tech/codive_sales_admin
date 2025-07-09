@@ -54,7 +54,7 @@ const mockStudents: Student[] = [
     email: 'rohan.kumar@email.com',
     age: 12,
     grade: '6',
-    program: 'Coding Fundamentals',
+    program: 'Junior-Intermediate',
     status: 'completed',
     paymentStatus: 'paid',
     enrollmentType: 'group',
@@ -186,6 +186,30 @@ const Students: React.FC = () => {
     setSelectedStudent(student);
     // For now, we'll just show a toast. You can implement reassign modal later
     toast.info('Program reassignment will be implemented soon!');
+  };
+
+  const handleProgramReassign = async (studentId: string, newProgram: string) => {
+    setIsLoading(true);
+    try {
+      // Update the student's program in the local state
+      setStudents(students.map(student => 
+        student.id === studentId 
+          ? { ...student, program: newProgram, updatedAt: new Date().toISOString() }
+          : student
+      ));
+      
+      // Show success toast
+      toast.success('Student program reassigned successfully');
+      
+      // Optional: Add a brief highlight effect to the updated row
+      // This could be implemented with a temporary CSS class or state
+      
+    } catch (error) {
+      console.error('Error reassigning program:', error);
+      toast.error('Failed to reassign program. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClearFilters = () => {
@@ -325,6 +349,7 @@ const Students: React.FC = () => {
         onEdit={handleEditStudent}
         onView={handleViewStudent}
         onReassign={handleReassignStudent}
+        onProgramReassign={handleProgramReassign}
       />
 
       {/* Add Student Modal */}

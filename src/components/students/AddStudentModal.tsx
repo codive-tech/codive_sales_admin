@@ -7,7 +7,7 @@ import CountrySelect from '../CountrySelect';
 import GradeSelect from '../GradeSelect';
 import RelationSelect from '../RelationSelect';
 import ClassTypeToggle from '../../basic_components/ClassTypeToggle';
-
+import { getProgramOptions, getProgramConfig } from '../../data/programConfig';
 interface AddStudentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -31,15 +31,8 @@ const grades = [
   { label: 'Grade 12', value: '12' }
 ];
 
-const programs = [
-  { label: 'Select Program', value: '' },
-  { label: 'AI Bootcamp', value: 'AI Bootcamp' },
-  { label: 'Robotics 101', value: 'Robotics 101' },
-  { label: 'Coding Fundamentals', value: 'Coding Fundamentals' },
-  { label: 'Data Science', value: 'Data Science' },
-  { label: 'Web Development', value: 'Web Development' },
-  { label: 'Mobile App Development', value: 'Mobile App Development' }
-];
+// Use the new program configuration
+const programs = getProgramOptions();
 
 const leadTypes = [
   { label: 'Select Lead Type', value: '' },
@@ -83,6 +76,9 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
 
   // Generate student ID when grade changes
   const studentId = formData.grade ? generateStudentId(MOCK_SCHOOL_ID, formData.grade) : '';
+
+  // Get selected program configuration
+  const selectedProgramConfig = formData.program ? getProgramConfig(formData.program) : null;
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -345,6 +341,25 @@ export function AddStudentModal({ isOpen, onClose, onSubmit, isLoading = false }
                 </select>
                 {errors.program && (
                   <p className="text-sm text-[#f55a5a] mt-1">{errors.program}</p>
+                )}
+                
+                {/* Program Description */}
+                {selectedProgramConfig && (
+                  <div className={`mt-3 p-3 rounded-lg border ${selectedProgramConfig.borderColor} ${selectedProgramConfig.bgColor}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`p-1.5 rounded-md ${selectedProgramConfig.bgColor}`}>
+                        <selectedProgramConfig.icon className={`h-4 w-4 ${selectedProgramConfig.textColor}`} />
+                      </div>
+                      <div className="flex-1">
+                        <p className={`text-sm font-medium ${selectedProgramConfig.textColor}`}>
+                          {formData.program}
+                        </p>
+                        <p className={`text-xs mt-1 ${selectedProgramConfig.textColor} opacity-80`}>
+                          {selectedProgramConfig.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
