@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Filter, X, Users, BookOpen } from 'lucide-react';
+import { getProgramOptions } from '../../data/programConfig';
 
 interface StudentFiltersProps {
   searchQuery: string;
@@ -11,14 +12,10 @@ interface StudentFiltersProps {
   onClearFilters: () => void;
 }
 
+// Use the new program configuration
 const programs = [
   { label: 'All Programs', value: '' },
-  { label: 'AI Bootcamp', value: 'AI Bootcamp' },
-  { label: 'Robotics 101', value: 'Robotics 101' },
-  { label: 'Coding Fundamentals', value: 'Coding Fundamentals' },
-  { label: 'Data Science', value: 'Data Science' },
-  { label: 'Web Development', value: 'Web Development' },
-  { label: 'Mobile App Development', value: 'Mobile App Development' }
+  ...getProgramOptions().slice(1) // Skip the "Select Program" option, start from index 1
 ];
 
 const statusOptions = [

@@ -15,11 +15,16 @@ interface AddSchoolModalProps {
 const programs = [
   { label: 'Select a program', value: '' },
   { label: 'AI Bootcamp', value: 'AI Bootcamp' },
-  { label: 'Robotics 101', value: 'Robotics 101' },
-  { label: 'Coding Fundamentals', value: 'Coding Fundamentals' },
-  { label: 'Data Science', value: 'Data Science' },
-  { label: 'Web Development', value: 'Web Development' },
-  { label: 'Mobile App Development', value: 'Mobile App Development' }
+  { label: 'Robotics Junior', value: 'Robotics Junior' },
+  { label: 'Robotics Senior', value: 'Robotics Senior' },
+  { label: 'Coding Explorer', value: 'Coding Explorer' },
+  { label: 'Coding Challenger', value: 'Coding Challenger' },
+  { label: 'Coding Innovator', value: 'Coding Innovator' },
+  { label: 'Coding Early Level', value: 'Coding Early Level' },
+  { label: 'Complete Java', value: 'Complete Java' },
+  { label: 'Web-development', value: 'Web-development' },
+  { label: 'Financial Literacy', value: 'Financial Literacy' },
+  { label: 'Coding Mastery', value: 'Coding Mastery' },
 ];
 
 const countries = [

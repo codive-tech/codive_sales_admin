@@ -3,16 +3,27 @@ import { Eye, Edit, RefreshCw, Users, GraduationCap, BookOpen, Phone, Mail, Tag,
 import { Student } from '../../types';
 import { StudentStatusBadge, PaymentStatusBadge, EnrollmentTypeBadge } from './StudentStatusBadge';
 import { LeadTypeBadge } from './LeadTypeBadge';
+import ReassignProgramModal from './ReassignProgramModal';
 
 interface StudentTableProps {
   students: Student[];
   onEdit: (student: Student) => void;
   onView: (student: Student) => void;
   onReassign: (student: Student) => void;
+  onProgramReassign?: (studentId: string, newProgram: string) => void;
 }
 
-export function StudentTable({ students, onEdit, onView, onReassign }: StudentTableProps) {
+export function StudentTable({ 
+  students, 
+  onEdit, 
+  onView, 
+  onReassign, 
+  onProgramReassign 
+}: StudentTableProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const [showReassignModal, setShowReassignModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isReassigning, setIsReassigning] = useState(false);
 
   const getSourceBadgeColor = (source: string) => {
     const colors: Record<string, string> = {
@@ -26,6 +37,38 @@ export function StudentTable({ students, onEdit, onView, onReassign }: StudentTa
       'Manual': 'bg-gray-100 text-gray-800'
     };
     return colors[source] || 'bg-gray-100 text-gray-800';
+  };
+
+  const handleReassignClick = (student: Student) => {
+    setSelectedStudent(student);
+    setShowReassignModal(true);
+  };
+
+  const handleProgramReassign = async (studentId: string, newProgram: string) => {
+    setIsReassigning(true);
+    try {
+      // Call the parent handler if provided
+      if (onProgramReassign) {
+        await onProgramReassign(studentId, newProgram);
+      }
+      
+      // Close modal and reset state
+      setShowReassignModal(false);
+      setSelectedStudent(null);
+      
+      // Optional: Add a brief highlight effect to the updated row
+      // This could be implemented with a temporary CSS class
+      
+    } catch (error) {
+      console.error('Error reassigning program:', error);
+    } finally {
+      setIsReassigning(false);
+    }
+  };
+
+  const handleCloseReassignModal = () => {
+    setShowReassignModal(false);
+    setSelectedStudent(null);
   };
 
   if (students.length === 0) {
@@ -174,7 +217,7 @@ export function StudentTable({ students, onEdit, onView, onReassign }: StudentTa
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onReassign(student);
+                        handleReassignClick(student);
                       }}
                       className="p-1 text-[#FFD600] hover:bg-[#E6F6FB] rounded transition-colors"
                       title="Reassign Program"
@@ -228,7 +271,7 @@ export function StudentTable({ students, onEdit, onView, onReassign }: StudentTa
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => onReassign(student)}
+                    onClick={() => handleReassignClick(student)}
                     className="p-1 text-[#FFD600] hover:bg-[#E6F6FB] rounded transition-colors"
                   >
                     <RefreshCw className="h-4 w-4" />
@@ -264,6 +307,15 @@ export function StudentTable({ students, onEdit, onView, onReassign }: StudentTa
           ))}
         </div>
       </div>
+
+      {/* Reassign Program Modal */}
+      <ReassignProgramModal
+        isOpen={showReassignModal}
+        onClose={handleCloseReassignModal}
+        student={selectedStudent}
+        onReassign={handleProgramReassign}
+        isLoading={isReassigning}
+      />
     </div>
   );
 } 
