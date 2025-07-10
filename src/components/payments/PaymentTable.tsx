@@ -63,15 +63,21 @@ const AnimatedCounter = ({ value, duration = 1000 }: { value: number; duration?:
   return <span>₹{count.toLocaleString()}</span>;
 };
 
-// Enhanced Status Badge Component with click functionality
+// Enhanced Status Badge Component with Razorpay webhook support
 const StatusBadge = ({ 
   status, 
   isVerified, 
-  onClick 
+  onClick,
+  amount,
+  partialAmount,
+  currency = 'INR'
 }: { 
   status: PaymentVerification['status']; 
   isVerified: boolean;
   onClick?: () => void;
+  amount?: number;
+  partialAmount?: number;
+  currency?: string;
 }) => {
   const getStatusConfig = (status: PaymentVerification['status']) => {
     switch (status) {
@@ -99,6 +105,18 @@ const StatusBadge = ({
     }
   };
 
+  const formatCurrency = (amount: number, currencyCode: string) => {
+    const formatters: Record<string, Intl.NumberFormat> = {
+      'INR': new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }),
+      'USD': new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
+      'AED': new Intl.NumberFormat('en-AE', { style: 'currency', currency: 'AED' }),
+      'ZAR': new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' })
+    };
+
+    const formatter = formatters[currencyCode] || formatters['INR'];
+    return formatter.format(amount);
+  };
+
   const config = getStatusConfig(status);
   const Icon = config.icon;
 
@@ -118,6 +136,15 @@ const StatusBadge = ({
         <Icon size={14} />
         <span>{config.text}</span>
       </button>
+      
+      {/* Partial Payment Amount Display */}
+      {status === 'partial' && partialAmount && amount && (
+        <div className="text-xs text-gray-600 font-medium">
+          Paid: {formatCurrency(partialAmount, currency)} / {formatCurrency(amount, currency)}
+        </div>
+      )}
+      
+      {/* Verification Status */}
       {isVerified && (
         <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 w-fit">
           <CheckCircle size={10} />
@@ -265,6 +292,18 @@ export const PaymentTable: React.FC<PaymentTableProps> = ({
     });
   };
 
+  const formatCurrency = (amount: number, currencyCode: string) => {
+    const formatters: Record<string, Intl.NumberFormat> = {
+      'INR': new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }),
+      'USD': new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
+      'AED': new Intl.NumberFormat('en-AE', { style: 'currency', currency: 'AED' }),
+      'ZAR': new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' })
+    };
+
+    const formatter = formatters[currencyCode] || formatters['INR'];
+    return formatter.format(amount);
+  };
+
   const handleStatusClick = (payment: PaymentVerification) => {
     setSelectedPayment(payment);
     setIsModalOpen(true);
@@ -313,10 +352,10 @@ export const PaymentTable: React.FC<PaymentTableProps> = ({
                   Amount
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  Actions
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Created
@@ -359,36 +398,39 @@ export const PaymentTable: React.FC<PaymentTableProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      ₹{payment.amount.toLocaleString()}
+                      {formatCurrency(payment.amount, payment.currency || 'INR')}
                     </div>
                     {payment.partialAmount && (
                       <div className="text-xs text-gray-500">
-                        Partial: ₹{payment.partialAmount.toLocaleString()}
+                        Partial: {formatCurrency(payment.partialAmount, payment.currency || 'INR')}
                       </div>
                     )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge 
-                      status={payment.status} 
-                      isVerified={payment.isVerified}
-                      onClick={() => handleStatusClick(payment)}
-                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleStatusClick(payment)}
-                        className="flex items-center space-x-1 px-2 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                        title="Edit payment status"
+                        className="flex items-center space-x-1 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                        title="Edit payment info and verification"
                       >
-                        <Edit size={12} />
-                        <span>Edit</span>
+                        <Edit size={14} />
+                        <span>Edit Payment</span>
                       </button>
                       <AssignCourseButton 
                         payment={payment} 
                         onAssign={handleAssignCourse}
                       />
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <StatusBadge 
+                      status={payment.status} 
+                      isVerified={payment.isVerified}
+                      onClick={() => handleStatusClick(payment)}
+                      amount={payment.amount}
+                      partialAmount={payment.partialAmount}
+                      currency={payment.currency}
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(payment.dateCreated)}

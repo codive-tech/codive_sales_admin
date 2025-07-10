@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Lead } from '../../types';
 import LeadStatusBadge from './LeadStatusBadge';
+import { DemoStatusBadge } from './DemoStatusBadge';
 import { leadStatuses } from '../../data/mockData';
 import { WhatsAppButton } from './WhatsAppButton';
-import { GraduationCap, Edit, MessageSquare, CheckCircle, ArrowRight } from 'lucide-react';
+import { GraduationCap, Edit, MessageSquare, CheckCircle, ArrowRight, Calendar, AlertTriangle, Users } from 'lucide-react';
 
 interface LeadsTableProps {
   leads: Lead[];
@@ -11,6 +12,8 @@ interface LeadsTableProps {
   onEditLead: (lead: Lead) => void;
   onViewNotes: (lead: Lead) => void;
   onConvertToStudent: (lead: Lead) => void;
+  onAssignDemo: (lead: Lead) => void;
+  onValidateDemo: (lead: Lead) => void;
 }
 
 const LeadsTable: React.FC<LeadsTableProps> = ({ 
@@ -18,7 +21,9 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
   onStatusChange, 
   onEditLead, 
   onViewNotes,
-  onConvertToStudent 
+  onConvertToStudent,
+  onAssignDemo,
+  onValidateDemo
 }) => {
   const [editingStatus, setEditingStatus] = useState<string | null>(null);
 
@@ -54,6 +59,17 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
     return colors[source] || 'bg-gray-100 text-gray-800';
   };
 
+  const shouldShowValidateButton = (lead: Lead) => {
+    if (!lead.demoDate) return false;
+    const demoDateTime = new Date(lead.demoDate);
+    const now = new Date();
+    return demoDateTime < now && !lead.adminValidation;
+  };
+
+  const shouldShowPushToStudentsButton = (lead: Lead) => {
+    return lead.status === 'Converted' && lead.adminValidation === 'eligible';
+  };
+
   if (leads.length === 0) {
     return (
       <div className="bg-white rounded-lg p-8 text-center">
@@ -81,6 +97,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Contact</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Campaign</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Status</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Demo Status</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Source</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Created On</th>
               <th className="px-6 py-4 text-left text-sm font-semibold text-[#1E2A3B]">Actions</th>
@@ -158,6 +175,12 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
                   )}
                 </td>
                 <td className="px-6 py-4">
+                  <DemoStatusBadge 
+                    demoDate={lead.demoDate}
+                    adminValidation={lead.adminValidation}
+                  />
+                </td>
+                <td className="px-6 py-4">
                   <span 
                     className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getSourceBadgeColor(lead.source)} cursor-help`}
                     title={`Source: ${lead.source}`}
@@ -186,13 +209,39 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
                       Edit
                     </button>
                     <span className="text-gray-300">|</span>
-                    {lead.status === 'Converted' ? (
+                    {!lead.demoDate && (
+                      <>
+                        <button
+                          onClick={() => onAssignDemo(lead)}
+                          className="text-[#FFD600] hover:text-[#E6C200] text-sm font-medium transition-colors flex items-center gap-1"
+                          title="Assign Demo"
+                        >
+                          <Calendar className="h-3 w-3" />
+                          Assign Demo
+                        </button>
+                        <span className="text-gray-300">|</span>
+                      </>
+                    )}
+                    {shouldShowValidateButton(lead) && (
+                      <>
+                        <button
+                          onClick={() => onValidateDemo(lead)}
+                          className="text-orange-600 hover:text-orange-700 text-sm font-medium transition-colors flex items-center gap-1"
+                          title="Validate Demo"
+                        >
+                          <AlertTriangle className="h-3 w-3" />
+                          Validate Demo
+                        </button>
+                        <span className="text-gray-300">|</span>
+                      </>
+                    )}
+                    {shouldShowPushToStudentsButton(lead) ? (
                       <button
                         onClick={() => onConvertToStudent(lead)}
                         className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors flex items-center gap-1"
                         title="Push to Students"
                       >
-                        <GraduationCap className="h-3 w-3" />
+                        <Users className="h-3 w-3" />
                         Push to Students
                       </button>
                     ) : (
@@ -235,6 +284,10 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
                     {lead.leadType}
                   </span>
                   <LeadStatusBadge status={lead.status} />
+                  <DemoStatusBadge 
+                    demoDate={lead.demoDate}
+                    adminValidation={lead.adminValidation}
+                  />
                   <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getSourceBadgeColor(lead.source)}`}>
                     {lead.source}
                   </span>
@@ -268,14 +321,32 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
                   <Edit className="h-3 w-3" />
                   Edit
                 </button>
+                {!lead.demoDate && (
+                  <button
+                    onClick={() => onAssignDemo(lead)}
+                    className="text-[#FFD600] hover:text-[#E6C200] text-sm font-medium transition-colors flex items-center gap-1"
+                  >
+                    <Calendar className="h-3 w-3" />
+                    Assign Demo
+                  </button>
+                )}
+                {shouldShowValidateButton(lead) && (
+                  <button
+                    onClick={() => onValidateDemo(lead)}
+                    className="text-orange-600 hover:text-orange-700 text-sm font-medium transition-colors flex items-center gap-1"
+                  >
+                    <AlertTriangle className="h-3 w-3" />
+                    Validate Demo
+                  </button>
+                )}
               </div>
               <div>
-                {lead.status === 'Converted' ? (
+                {shouldShowPushToStudentsButton(lead) ? (
                   <button
                     onClick={() => onConvertToStudent(lead)}
                     className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors flex items-center gap-1"
                   >
-                    <GraduationCap className="h-3 w-3" />
+                    <Users className="h-3 w-3" />
                     Push to Students
                   </button>
                 ) : (

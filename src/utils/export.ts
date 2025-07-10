@@ -47,14 +47,16 @@ export function exportRevenueToCSV(data: RevenueRecord[], filename: string = 're
   // Define headers
   const headers = [
     'Date',
-    'Name',
-    'Program',
-    'Amount Collected (₹)',
+    'User Type',
+    'User ID',
+    'User Name',
+    'Assigned Program',
+    'Amount Collected',
+    'Payment Method',
     'Razorpay Reference ID',
-    'Partner ID',
     'Payment Status',
-    'Converted By',
-    'Lead Type'
+    'Lead Type',
+    'Currency'
   ];
 
   // Convert data to CSV format
@@ -62,14 +64,16 @@ export function exportRevenueToCSV(data: RevenueRecord[], filename: string = 're
     headers.join(','),
     ...data.map(record => [
       new Date(record.date).toLocaleDateString('en-GB'),
-      `"${record.name}"`,
+      record.userType,
+      `"${record.userId}"`,
+      `"${record.userName}"`,
       `"${record.program}"`,
       record.amountCollected,
-      record.razorpayReferenceId,
-      record.partnerId,
+      record.paymentMethod,
+      record.razorpayReferenceId || '',
       record.paymentStatus,
-      record.convertedBy || '',
-      record.leadType
+      record.leadType,
+      record.currency || 'INR'
     ].join(','))
   ].join('\n');
 

@@ -78,10 +78,10 @@ export const mockSchools = [
     lastEdited: '2024-03-10T14:30:00Z',
     studentGrowth: { '2023': 1150, '2024': 1250 },
     gradeAllocations: [
-      { grade: 9, students: 200, sections: ['A', 'B', 'C', 'D'] },
-      { grade: 10, students: 180, sections: ['A', 'B', 'C'] },
-      { grade: 11, students: 150, sections: ['A', 'B'] },
-      { grade: 12, students: 120, sections: ['A'] }
+      { grade: 9, students: 200, sections: ['A', 'B', 'C', 'D'], course: 'AI Bootcamp' },
+      { grade: 10, students: 180, sections: ['A', 'B', 'C'], course: 'Robotics Junior' },
+      { grade: 11, students: 150, sections: ['A', 'B'], course: 'Coding Mastery' },
+      { grade: 12, students: 120, sections: ['A'], course: 'Financial Literacy' }
     ],
     section: [
       {
@@ -118,9 +118,9 @@ export const mockSchools = [
     lastEdited: '2024-03-12T09:15:00Z',
     studentGrowth: { '2023': 800, '2024': 850 },
     gradeAllocations: [
-      { grade: 8, students: 150, sections: ['A', 'B', 'C'] },
-      { grade: 9, students: 200, sections: ['A', 'B', 'C', 'D'] },
-      { grade: 10, students: 180, sections: ['A', 'B', 'C'] }
+      { grade: 8, students: 150, sections: ['A', 'B', 'C'], course: 'Robotics Senior' },
+      { grade: 9, students: 200, sections: ['A', 'B', 'C', 'D'], course: 'Coding Challenger' },
+      { grade: 10, students: 180, sections: ['A', 'B', 'C'], course: 'Web-development' }
     ],
     section: [
       {
@@ -157,9 +157,9 @@ export const mockSchools = [
     lastEdited: '2024-03-08T16:45:00Z',
     studentGrowth: { '2023': 600, '2024': 650 },
     gradeAllocations: [
-      { grade: 7, students: 120, sections: ['A', 'B'] },
-      { grade: 8, students: 150, sections: ['A', 'B', 'C'] },
-      { grade: 9, students: 180, sections: ['A', 'B', 'C', 'D'] }
+      { grade: 7, students: 120, sections: ['A', 'B'], course: 'Coding Explorer' },
+      { grade: 8, students: 150, sections: ['A', 'B', 'C'], course: 'Coding Early Level' },
+      { grade: 9, students: 180, sections: ['A', 'B', 'C', 'D'], course: 'Starter pack' }
     ],
     section: [
       {
@@ -196,10 +196,10 @@ export const mockSchools = [
     lastEdited: '2024-03-14T11:20:00Z',
     studentGrowth: { '2023': 1800, '2024': 2000 },
     gradeAllocations: [
-      { grade: 9, students: 300, sections: ['A', 'B', 'C', 'D', 'E'] },
-      { grade: 10, students: 280, sections: ['A', 'B', 'C', 'D'] },
-      { grade: 11, students: 250, sections: ['A', 'B', 'C'] },
-      { grade: 12, students: 220, sections: ['A', 'B'] }
+      { grade: 9, students: 300, sections: ['A', 'B', 'C', 'D', 'E'], course: 'Coding Mastery' },
+      { grade: 10, students: 280, sections: ['A', 'B', 'C', 'D'], course: 'AI Bootcamp' },
+      { grade: 11, students: 250, sections: ['A', 'B', 'C'], course: 'Hackathon preparation' },
+      { grade: 12, students: 220, sections: ['A', 'B'], course: 'Bootcamp adventure' }
     ],
     section: [
       {
@@ -236,9 +236,9 @@ export const mockSchools = [
     lastEdited: '2024-03-13T15:30:00Z',
     studentGrowth: { '2023': 1100, '2024': 1200 },
     gradeAllocations: [
-      { grade: 10, students: 200, sections: ['A', 'B', 'C'] },
-      { grade: 11, students: 180, sections: ['A', 'B'] },
-      { grade: 12, students: 150, sections: ['A'] }
+      { grade: 10, students: 200, sections: ['A', 'B', 'C'], course: 'Web-development' },
+      { grade: 11, students: 180, sections: ['A', 'B'], course: 'Complete Java' },
+      { grade: 12, students: 150, sections: ['A'], course: 'Coding Innovator' }
     ],
     section: [
       {
@@ -275,9 +275,9 @@ export const mockSchools = [
     lastEdited: '2024-03-11T10:45:00Z',
     studentGrowth: { '2023': 750, '2024': 800 },
     gradeAllocations: [
-      { grade: 9, students: 150, sections: ['A', 'B'] },
-      { grade: 10, students: 180, sections: ['A', 'B', 'C'] },
-      { grade: 11, students: 120, sections: ['A'] }
+      { grade: 9, students: 150, sections: ['A', 'B'], course: 'Complete Java' },
+      { grade: 10, students: 180, sections: ['A', 'B', 'C'], course: 'AI Bootcamp' },
+      { grade: 11, students: 120, sections: ['A'], course: 'Coding Innovator' }
     ],
     section: [
       {
@@ -338,9 +338,9 @@ export const mockSchools = [
     lastEdited: '2024-03-15T08:30:00Z',
     studentGrowth: { '2023': 0, '2024': 950 },
     gradeAllocations: [
-      { grade: 8, students: 120, sections: ['A', 'B'] },
-      { grade: 9, students: 180, sections: ['A', 'B', 'C'] },
-      { grade: 10, students: 200, sections: ['A', 'B', 'C', 'D'] }
+      { grade: 8, students: 120, sections: ['A', 'B'], course: 'Robotics Junior' },
+      { grade: 9, students: 180, sections: ['A', 'B', 'C'], course: 'AI Bootcamp' },
+      { grade: 10, students: 200, sections: ['A', 'B', 'C', 'D'], course: 'Web-development' }
     ],
     section: [
       {
@@ -377,9 +377,9 @@ export const mockSchools = [
     lastEdited: '2024-03-12T14:15:00Z',
     studentGrowth: { '2023': 650, '2024': 700 },
     gradeAllocations: [
-      { grade: 10, students: 150, sections: ['A', 'B'] },
-      { grade: 11, students: 180, sections: ['A', 'B', 'C'] },
-      { grade: 12, students: 120, sections: ['A'] }
+      { grade: 10, students: 150, sections: ['A', 'B'], course: 'Financial Literacy' },
+      { grade: 11, students: 180, sections: ['A', 'B', 'C'], course: 'AI Bootcamp' },
+      { grade: 12, students: 120, sections: ['A'], course: 'Coding Innovator' }
     ],
     section: [
       {
@@ -416,10 +416,10 @@ export const mockSchools = [
     lastEdited: '2024-03-14T16:45:00Z',
     studentGrowth: { '2023': 1000, '2024': 1100 },
     gradeAllocations: [
-      { grade: 9, students: 200, sections: ['A', 'B', 'C'] },
-      { grade: 10, students: 220, sections: ['A', 'B', 'C', 'D'] },
-      { grade: 11, students: 180, sections: ['A', 'B'] },
-      { grade: 12, students: 150, sections: ['A'] }
+      { grade: 9, students: 200, sections: ['A', 'B', 'C'], course: 'Web-development' },
+      { grade: 10, students: 220, sections: ['A', 'B', 'C', 'D'], course: 'AI Bootcamp' },
+      { grade: 11, students: 180, sections: ['A', 'B'], course: 'Complete Java' },
+      { grade: 12, students: 150, sections: ['A'], course: 'Coding Innovator' }
     ],
     section: [
       {
@@ -456,8 +456,8 @@ export const mockSchools = [
     lastEdited: '2024-03-15T12:00:00Z',
     studentGrowth: { '2023': 0, '2024': 600 },
     gradeAllocations: [
-      { grade: 11, students: 150, sections: ['A', 'B'] },
-      { grade: 12, students: 120, sections: ['A'] }
+      { grade: 11, students: 150, sections: ['A', 'B'], course: 'AI Bootcamp' },
+      { grade: 12, students: 120, sections: ['A'], course: 'Coding Innovator' }
     ],
     section: [
       {
@@ -494,8 +494,8 @@ export const mockSchools = [
     lastEdited: '2024-03-07T11:30:00Z',
     studentGrowth: { '2023': 400, '2024': 450 },
     gradeAllocations: [
-      { grade: 10, students: 120, sections: ['A', 'B'] },
-      { grade: 11, students: 150, sections: ['A', 'B', 'C'] }
+      { grade: 10, students: 120, sections: ['A', 'B'], course: 'Coding Challenger' },
+      { grade: 11, students: 150, sections: ['A', 'B', 'C'], course: 'AI Bootcamp' }
     ],
     section: [
       {
@@ -525,6 +525,11 @@ export const mockLeads = [
     notes: 'Interested in AI program for her 15-year-old son. Prefers weekend classes.',
     status: 'New' as const,
     campaignId: 'SUMMER2024',
+    // Demo assignment for testing
+    demoDate: '2024-03-20T14:00:00Z',
+    demoInstructor: 'Sarah Johnson',
+    demoNotes: 'Weekend demo preferred. Son is very interested in AI.',
+    demoStatus: 'scheduled' as const,
     createdAt: '2024-03-15T10:30:00Z',
     updatedAt: '2024-03-15T10:30:00Z'
   },
@@ -539,6 +544,11 @@ export const mockLeads = [
     notes: 'School principal interested in implementing robotics curriculum. Budget approved for 50 students.',
     status: 'Contacted' as const,
     campaignId: 'EDU_CONF_2024',
+    // Demo assignment for testing
+    demoDate: '2024-03-18T10:00:00Z',
+    demoInstructor: 'Michael Chen',
+    demoNotes: 'School demo for principal and IT coordinator.',
+    demoStatus: 'scheduled' as const,
     createdAt: '2024-03-14T14:20:00Z',
     updatedAt: '2024-03-15T09:15:00Z'
   },
@@ -551,10 +561,18 @@ export const mockLeads = [
     programOfInterest: 'Hackathon',
     source: 'WhatsApp' as const,
     notes: 'Looking for coding competitions for daughter. Wants to know about upcoming hackathons.',
-    status: 'Follow-Up' as const,
+    status: 'Converted' as const,
     campaignId: 'WHATSAPP_ADS',
+    // Demo completed and validated as eligible
+    demoDate: '2024-03-10T16:00:00Z',
+    demoInstructor: 'Emma Rodriguez',
+    demoNotes: 'Daughter showed great interest in hackathon. Very motivated student.',
+    demoStatus: 'completed' as const,
+    adminValidation: 'eligible' as const,
+    adminValidationDate: '2024-03-11T09:00:00Z',
+    adminValidationNotes: 'Student is highly motivated and has good coding background. Perfect fit for hackathon program.',
     createdAt: '2024-03-13T16:45:00Z',
-    updatedAt: '2024-03-14T11:30:00Z'
+    updatedAt: '2024-03-11T09:00:00Z'
   },
   {
     id: 'lead_4',
@@ -567,8 +585,16 @@ export const mockLeads = [
     notes: 'Referred by Springfield High. Interested in AI program for grades 9-12.',
     status: 'Converted' as const,
     campaignId: 'REFERRAL_PROGRAM',
+    // Demo completed and validated as eligible
+    demoDate: '2024-03-08T14:00:00Z',
+    demoInstructor: 'David Wilson',
+    demoNotes: 'School demo went very well. Teachers and students were engaged.',
+    demoStatus: 'completed' as const,
+    adminValidation: 'eligible' as const,
+    adminValidationDate: '2024-03-09T11:00:00Z',
+    adminValidationNotes: 'School has strong technical infrastructure and motivated students. Ready for AI program implementation.',
     createdAt: '2024-03-10T08:15:00Z',
-    updatedAt: '2024-03-12T15:45:00Z'
+    updatedAt: '2024-03-09T11:00:00Z'
   },
   {
     id: 'lead_5',
@@ -594,8 +620,16 @@ export const mockLeads = [
     source: 'Manual' as const,
     notes: 'School wants to host a hackathon event. Need details about logistics and costs.',
     status: 'Cold' as const,
+    // Demo completed but rejected
+    demoDate: '2024-03-05T15:00:00Z',
+    demoInstructor: 'Priya Patel',
+    demoNotes: 'School demo completed but budget constraints are significant.',
+    demoStatus: 'completed' as const,
+    adminValidation: 'not_eligible' as const,
+    adminValidationDate: '2024-03-06T10:00:00Z',
+    adminValidationNotes: 'School has budget constraints and cannot commit to the program at this time.',
     createdAt: '2024-03-08T10:20:00Z',
-    updatedAt: '2024-03-11T14:30:00Z'
+    updatedAt: '2024-03-06T10:00:00Z'
   }
 ];
 

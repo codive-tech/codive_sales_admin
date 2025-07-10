@@ -56,6 +56,7 @@ export interface GradeAllocation {
   grade: number;
   students: number;
   sections: string[];
+  course?: string;
 }
 
 export interface SchoolData {

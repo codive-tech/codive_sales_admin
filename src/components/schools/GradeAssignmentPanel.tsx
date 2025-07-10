@@ -8,12 +8,33 @@ export interface GradeAllocation {
   grade: number;
   students: number;
   sections: string[];
+  course?: string;
 }
 
 interface GradeAssignmentPanelProps {
   totalStudentsExpected: number;
   onAllocationChange: (allocations: GradeAllocation[]) => void;
 }
+
+// Course options for each grade
+const courseOptions = [
+  { label: 'Select Course', value: '' },
+  { label: 'AI Bootcamp', value: 'AI Bootcamp' },
+  { label: 'Robotics Junior', value: 'Robotics Junior' },
+  { label: 'Robotics Senior', value: 'Robotics Senior' },
+  { label: 'Coding Explorer', value: 'Coding Explorer' },
+  { label: 'Coding Challenger', value: 'Coding Challenger' },
+  { label: 'Coding Innovator', value: 'Coding Innovator' },
+  { label: 'Coding Early Level', value: 'Coding Early Level' },
+  { label: 'Complete Java', value: 'Complete Java' },
+  { label: 'Web-development', value: 'Web-development' },
+  { label: 'Financial Literacy', value: 'Financial Literacy' },
+  { label: 'Coding Mastery', value: 'Coding Mastery' },
+  { label: 'Starter pack', value: 'Starter pack' },
+  { label: 'Hackathon preparation', value: 'Hackathon preparation' },
+  { label: 'Bootcamp adventure', value: 'Bootcamp adventure' },
+  { label: 'Not Assigned', value: 'Not Assigned' }
+];
 
 export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
   totalStudentsExpected,
@@ -23,7 +44,17 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
   const [gradeErrors, setGradeErrors] = useState<Record<number, string>>({});
   const [touched, setTouched] = useState(false);
   const [expandedGrade, setExpandedGrade] = useState<number | null>(null);
-  const [inputState, setInputState] = useState<{ students: number; sections: string[]; error: string | null }>({ students: 0, sections: [], error: null });
+  const [inputState, setInputState] = useState<{ 
+    students: number; 
+    sections: string[]; 
+    course: string;
+    error: string | null 
+  }>({ 
+    students: 0, 
+    sections: [], 
+    course: '',
+    error: null 
+  });
 
   const grades = Array.from({ length: 10 }, (_, i) => i + 1);
 
@@ -42,12 +73,12 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
   };
 
   // Handle update from each grade
-  const handleGradeUpdate = (grade: number, students: number, sections: string[]) => {
+  const handleGradeUpdate = (grade: number, students: number, sections: string[], course?: string) => {
     setTouched(true);
     setAllocations(prev => {
       const filtered = prev.filter(a => a.grade !== grade);
       if (students > 0) {
-        return [...filtered, { grade, students, sections }].sort((a, b) => a.grade - b.grade);
+        return [...filtered, { grade, students, sections, course }].sort((a, b) => a.grade - b.grade);
       }
       return filtered;
     });
@@ -64,6 +95,7 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
     setInputState({
       students: allocation?.students || 0,
       sections: allocation?.sections || [],
+      course: allocation?.course || '',
       error: null
     });
   };
@@ -92,10 +124,19 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
     setInputState(prev => ({ ...prev, sections }));
   };
 
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setInputState(prev => ({ ...prev, course: e.target.value }));
+  };
+
   // Save expanded grade changes
   const handleSave = () => {
     if (expandedGrade == null) return;
-    handleGradeUpdate(expandedGrade, inputState.students, inputState.sections.length > 0 ? inputState.sections : ['Single Class']);
+    handleGradeUpdate(
+      expandedGrade, 
+      inputState.students, 
+      inputState.sections.length > 0 ? inputState.sections : ['Single Class'],
+      inputState.course
+    );
     setExpandedGrade(null);
   };
 
@@ -168,12 +209,17 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
           </div>
           {/* Add a drop down to select the courses*/}
           <div className="flex items-center gap-2">
-            <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Courses</label>
-            <select className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-[#00AEEF] hover:shadow transition-all h-11">
-              <option value="">Select Course</option>
-              <option value="1">Course 1</option>
-              <option value="2">Course 2</option>
-              <option value="3">Course 3</option>
+            <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Course</label>
+            <select 
+              value={inputState.course}
+              onChange={handleCourseChange}
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-[#00AEEF] hover:shadow transition-all h-11"
+            >
+              {courseOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
           {/* Number of Students */}

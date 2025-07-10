@@ -7,7 +7,15 @@ import {
   CheckCircle, 
   AlertCircle,
   Download,
-  Eye
+  Eye,
+  Copy,
+  MessageCircle,
+  Link,
+  ToggleLeft,
+  ToggleRight,
+  IndianRupee,
+  User,
+  Building
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { PaymentVerification, PaymentVerificationForm } from '../../types';
@@ -166,6 +174,97 @@ const FileUpload = ({
   );
 };
 
+// Razorpay Link Generator Component
+const RazorpayLinkGenerator = ({ 
+  payment,
+  onGenerateLink 
+}: { 
+  payment: PaymentVerification;
+  onGenerateLink: () => void;
+}) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState<string>('');
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerateLink = async () => {
+    setIsGenerating(true);
+    try {
+      // Simulate API call to generate Razorpay link
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock generated link (in real implementation, this would come from backend)
+      const mockLink = `https://pay.razorpay.com/pay/${payment.paymentIdGenerated}?amount=${payment.amount * 100}&email=${payment.studentId ? 'student@example.com' : 'school@example.com'}&program=${payment.courseTitle}`;
+      setGeneratedLink(mockLink);
+      
+      toast.success('Payment link generated successfully!');
+    } catch (error) {
+      toast.error('Failed to generate payment link');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedLink);
+      setCopied(true);
+      toast.success('Payment link copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast.error('Failed to copy payment link');
+    }
+  };
+
+  const sendViaWhatsApp = () => {
+    const message = `Payment Link for ${payment.courseTitle}:\n\nAmount: ₹${payment.amount.toLocaleString()}\n\n${generatedLink}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-medium text-gray-700">Razorpay Payment Link</h4>
+        <button
+          onClick={handleGenerateLink}
+          disabled={isGenerating}
+          className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+        >
+          <Link size={16} />
+          <span>{isGenerating ? 'Generating...' : 'Create Payment Link'}</span>
+        </button>
+      </div>
+
+      {generatedLink && (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-green-800">Generated Payment Link:</span>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={copyToClipboard}
+                className="flex items-center space-x-1 px-2 py-1 text-green-700 hover:bg-green-100 rounded transition-colors"
+              >
+                <Copy size={14} />
+                <span className="text-xs">{copied ? 'Copied!' : 'Copy'}</span>
+              </button>
+              <button
+                onClick={sendViaWhatsApp}
+                className="flex items-center space-x-1 px-2 py-1 text-green-700 hover:bg-green-100 rounded transition-colors"
+              >
+                <MessageCircle size={14} />
+                <span className="text-xs">Send</span>
+              </button>
+            </div>
+          </div>
+          <div className="text-xs text-green-700 break-all bg-white p-2 rounded border">
+            {generatedLink}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const PaymentVerificationModal: React.FC<PaymentVerificationModalProps> = ({
   isOpen,
   onClose,
@@ -174,25 +273,44 @@ export const PaymentVerificationModal: React.FC<PaymentVerificationModalProps> =
 }) => {
   const [formData, setFormData] = useState<PaymentVerificationForm>({
     status: payment.status,
-    paymentNotes: payment.paymentNotes || '',
-    receiptFile: payment.receiptFile,
-    proofImage: payment.proofImage
+    paymentNotes: '',
+    receiptFile: undefined,
+    proofImage: undefined
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [useRazorpay, setUseRazorpay] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
+
+  // Detect if payment is via Razorpay (UI-only logic)
+  const isRazorpayPayment = payment.paymentMethod === 'razorpay' || payment.paymentIdGenerated.includes('RZP');
+
+  // Multi-currency formatting
+  const formatCurrency = (amount: number, currencyCode: string) => {
+    const formatters: Record<string, Intl.NumberFormat> = {
+      'INR': new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }),
+      'USD': new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
+      'AED': new Intl.NumberFormat('en-AE', { style: 'currency', currency: 'AED' }),
+      'ZAR': new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' })
+    };
+
+    const formatter = formatters[currencyCode] || formatters['INR'];
+    return formatter.format(amount);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (formData.status === 'partial' && !formData.receiptFile) {
-      toast.error('Receipt upload is required for partial payments');
-      return;
-    }
+    // Validate required fields for manual mode
+    if (!useRazorpay) {
+      if (formData.status === 'partial' && !formData.receiptFile) {
+        toast.error('Receipt upload is required for partial payments');
+        return;
+      }
 
-    if (!formData.receiptFile) {
-      toast.error('Receipt upload is required');
-      return;
+      if (!formData.receiptFile) {
+        toast.error('Receipt upload is required');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -212,20 +330,31 @@ export const PaymentVerificationModal: React.FC<PaymentVerificationModalProps> =
     setFormData(prev => ({ ...prev, [field]: file }));
   };
 
+  const copyPaymentId = async () => {
+    try {
+      await navigator.clipboard.writeText(payment.paymentIdGenerated);
+      setCopiedId(true);
+      toast.success('Payment ID copied to clipboard!');
+      setTimeout(() => setCopiedId(false), 2000);
+    } catch (error) {
+      toast.error('Failed to copy payment ID');
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold" style={{ color: colors.navy }}>
-                Payment Verification
+                Edit Payment Info
               </h3>
               <p className="text-sm text-gray-600 mt-1">
-                Update payment status and upload verification documents
+                Update payment status and manage verification documents
               </p>
             </div>
             <button
@@ -239,21 +368,54 @@ export const PaymentVerificationModal: React.FC<PaymentVerificationModalProps> =
 
         {/* Payment Details */}
         <div className="p-6 border-b border-gray-200 bg-gray-50">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
               <span className="text-gray-500">Payment ID:</span>
-              <p className="font-medium">{payment.paymentIdGenerated}</p>
+              <div className="flex items-center space-x-2">
+                <p className="font-medium">{payment.paymentIdGenerated}</p>
+                <button
+                  onClick={copyPaymentId}
+                  className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Copy Payment ID"
+                >
+                  <Copy size={14} />
+                </button>
+              </div>
             </div>
             <div>
-              <span className="text-gray-500">Amount:</span>
-              <p className="font-medium">₹{payment.amount.toLocaleString()}</p>
+              <span className="text-gray-500">Payer Type:</span>
+              <div className="flex items-center space-x-1">
+                {payment.studentId ? (
+                  <>
+                    <User size={14} className="text-blue-600" />
+                    <p className="font-medium">Student</p>
+                  </>
+                ) : (
+                  <>
+                    <Building size={14} className="text-green-600" />
+                    <p className="font-medium">School</p>
+                  </>
+                )}
+              </div>
             </div>
             <div>
-              <span className="text-gray-500">Course:</span>
+              <span className="text-gray-500">ID:</span>
+              <p className="font-medium">{payment.studentId || payment.schoolId}</p>
+            </div>
+            <div>
+              <span className="text-gray-500">Program:</span>
               <p className="font-medium">{payment.courseTitle}</p>
             </div>
             <div>
-              <span className="text-gray-500">Current Status:</span>
+              <span className="text-gray-500">Email:</span>
+              <p className="font-medium text-gray-400">student@example.com</p>
+            </div>
+            <div>
+              <span className="text-gray-500">Deal Amount:</span>
+              <p className="font-medium">{formatCurrency(payment.amount, payment.currency || 'INR')}</p>
+            </div>
+            <div>
+              <span className="text-gray-500">Payment Status:</span>
               <div className="flex items-center space-x-2 mt-1">
                 <div 
                   className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -264,10 +426,20 @@ export const PaymentVerificationModal: React.FC<PaymentVerificationModalProps> =
                 >
                   {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
                 </div>
-                {payment.isVerified && (
+              </div>
+            </div>
+            <div>
+              <span className="text-gray-500">Verification Status:</span>
+              <div className="flex items-center space-x-2 mt-1">
+                {payment.isVerified ? (
                   <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     <CheckCircle size={12} />
                     <span>Verified</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <AlertCircle size={12} />
+                    <span>Not Verified</span>
                   </div>
                 )}
               </div>
@@ -290,61 +462,154 @@ export const PaymentVerificationModal: React.FC<PaymentVerificationModalProps> =
               }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="paid">✅ Paid</option>
-              <option value="partial">🟡 Partial</option>
               <option value="pending">🔴 Pending</option>
+              <option value="partial">🟡 Partial</option>
+              <option value="paid">✅ Paid</option>
             </select>
           </div>
 
-          {/* Partial Payment Warning */}
-          {formData.status === 'partial' && (
-            <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
-              <div className="flex items-start space-x-3">
-                <AlertCircle size={20} className="text-yellow-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-yellow-800">
-                    Partial Payment Notice
-                  </p>
-                  <p className="text-sm text-yellow-700 mt-1">
-                    Receipt upload is required. Pending balance will be reflected before course assignment.
-                  </p>
-                </div>
+          {/* Razorpay Toggle */}
+          <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Link size={20} className="text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-blue-800">Collect via Razorpay</p>
+                <p className="text-xs text-blue-600">Generate online payment link for this transaction</p>
               </div>
             </div>
-          )}
-
-          {/* Payment Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Payment Notes
-            </label>
-            <textarea
-              value={formData.paymentNotes}
-              onChange={(e) => setFormData(prev => ({ ...prev, paymentNotes: e.target.value }))}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Add any notes about this payment..."
-            />
+            <button
+              type="button"
+              onClick={() => setUseRazorpay(!useRazorpay)}
+              className="flex items-center space-x-2 px-3 py-2 bg-white border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+            >
+              {useRazorpay ? (
+                <>
+                  <ToggleRight size={16} className="text-blue-600" />
+                  <span className="text-sm text-blue-600">Enabled</span>
+                </>
+              ) : (
+                <>
+                  <ToggleLeft size={16} className="text-gray-400" />
+                  <span className="text-sm text-gray-600">Disabled</span>
+                </>
+              )}
+            </button>
           </div>
 
-          {/* Receipt Upload */}
-          <FileUpload
-            label="Payment Receipt"
-            accept=".pdf,.doc,.docx,image/*"
-            file={formData.receiptFile}
-            onFileChange={handleFileChange('receiptFile')}
-            required={true}
-          />
+          {/* Conditional Sections */}
+          {useRazorpay ? (
+            /* Section B: Razorpay Mode */
+            <div className="space-y-4">
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle size={20} className="text-yellow-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-yellow-800">
+                      Online Payment Mode
+                    </p>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      Payment link will be generated. After payment completion, manually mark as verified and assign course.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-          {/* Proof Image Upload */}
-          <FileUpload
-            label="Proof Image (Optional)"
-            accept="image/*,.pdf"
-            file={formData.proofImage}
-            onFileChange={handleFileChange('proofImage')}
-            required={false}
-            preview={true}
-          />
+              <RazorpayLinkGenerator 
+                payment={payment}
+                onGenerateLink={() => {}}
+              />
+
+              {/* Payment Notes for Razorpay */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Payment Notes
+                </label>
+                <textarea
+                  value={formData.paymentNotes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, paymentNotes: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Add any notes about this payment..."
+                />
+              </div>
+            </div>
+          ) : (
+            /* Section A: Manual Entry Mode */
+            <div className="space-y-4">
+              {/* Razorpay Payment Notice */}
+              {isRazorpayPayment && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start space-x-3">
+                    <Link size={20} className="text-blue-600 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-blue-800">
+                        Razorpay Payment Detected
+                      </p>
+                      <p className="text-sm text-blue-700 mt-1">
+                        This payment was processed via Razorpay. Proof upload is not required as payment verification is handled automatically.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Partial Payment Warning */}
+              {formData.status === 'partial' && !isRazorpayPayment && (
+                <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle size={20} className="text-yellow-600 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800">
+                        Partial Payment Notice
+                      </p>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        Receipt upload is required. Pending balance will be reflected before course assignment.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Notes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Payment Notes
+                </label>
+                <textarea
+                  value={formData.paymentNotes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, paymentNotes: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Add any notes about this payment..."
+                />
+              </div>
+
+              {/* Receipt Upload - Hidden for Razorpay payments */}
+              {!isRazorpayPayment && (
+                <FileUpload
+                  label="Payment Receipt"
+                  accept=".pdf,.doc,.docx,image/*"
+                  file={formData.receiptFile}
+                  onFileChange={handleFileChange('receiptFile')}
+                  required={true}
+                />
+              )}
+
+              {/* Proof Image Upload - Hidden for Razorpay payments */}
+              {!isRazorpayPayment && (
+                <FileUpload
+                  label="Proof Image (Optional)"
+                  accept="image/*,.pdf"
+                  file={formData.proofImage}
+                  onFileChange={handleFileChange('proofImage')}
+                  required={false}
+                  preview={true}
+                />
+              )}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex space-x-3 pt-4">
@@ -357,11 +622,11 @@ export const PaymentVerificationModal: React.FC<PaymentVerificationModalProps> =
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !formData.receiptFile}
+              disabled={isSubmitting || (!useRazorpay && !isRazorpayPayment && !formData.receiptFile)}
               className="flex-1 px-4 py-2 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ backgroundColor: colors.primary }}
             >
-              {isSubmitting ? 'Updating...' : 'Update Payment'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>

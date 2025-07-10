@@ -8,7 +8,7 @@ import { SchoolProfileModal } from '../components/schools/SchoolProfileModal';
 import { filterData } from '../utils/filters';
 import { SchoolData } from "../types/school";
 import { mockSchools } from "../data/mockData";
-import { Plus, Building, Download, Search } from 'lucide-react';
+import { Plus, Building, Download, Search, Users, DollarSign, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from "react-toastify";
 
 export function Schools() {
@@ -24,6 +24,25 @@ export function Schools() {
   const [programFilter, setProgramFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const totalSchools = schools.length;
+    const totalStudentsEnrolled = schools.reduce((sum, school) => sum + (school.totalStudents || 0), 0);
+    const paidSchools = schools.filter(school => (school.lockedDealAmount || 0) > 0).length;
+    const unpaidSchools = schools.filter(school => !school.lockedDealAmount || school.lockedDealAmount === 0).length;
+    const activeSchools = schools.filter(school => school.status === 'active').length;
+    const inactiveSchools = schools.filter(school => school.status !== 'active').length;
+
+    return {
+      totalSchools,
+      totalStudentsEnrolled,
+      paidSchools,
+      unpaidSchools,
+      activeSchools,
+      inactiveSchools
+    };
+  }, [schools]);
 
   // Filter schools based on all criteria
   const filteredSchools = useMemo(() => {
@@ -140,11 +159,12 @@ export function Schools() {
 
   const handleExportCSV = () => {
     const csvContent = [
-      ['School Name', 'School Code', 'Contact Person', 'Email', 'Phone', 'Location', 'Program', 'Status', 'Expected Students', 'Current Students', 'Deal Amount', 'Deal Currency', 'Enrollment Date'],
+      ['School Name', 'School Code', 'Contact Person', 'Role', 'Email', 'Phone', 'Location', 'Program', 'Status', 'Expected Students', 'Current Students', 'Deal Amount', 'Deal Currency', 'Enrollment Date'],
       ...filteredSchools.map(school => [
         school.name || '',
         school.schoolCode || '',
         school.principalName || '',
+        school.contactPersonRole || '',
         school.contactEmail || '',
         school.contactNumber || '',
         `${school.city || ''}, ${school.country || ''}`,
@@ -193,9 +213,6 @@ export function Schools() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[#1E2A3B]">Manage Schools</h1>
-              <p className="text-sm text-[#666] mt-1">
-                {filteredSchools.length} of {schools.length} schools
-              </p>
             </div>
           </div>
           
@@ -217,6 +234,57 @@ export function Schools() {
               <Plus className="h-4 w-4" />
               Add School
             </button>
+          </div>
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-6 pt-6 border-t border-[#E0E0E0]">
+          <div className="bg-[#EAF6FF] rounded-xl p-4">
+            <div className="flex items-center gap-2">
+              <Building className="h-5 w-5 text-[#0481FF]" />
+              <span className="text-sm font-medium text-[#003C64]">Total Schools</span>
+            </div>
+            <p className="text-2xl font-bold text-[#0481FF] mt-1">{stats.totalSchools}</p>
+          </div>
+          
+          <div className="bg-[#EAF6FF] rounded-xl p-4">
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-[#0481FF]" />
+              <span className="text-sm font-medium text-[#003C64]">Students Enrolled</span>
+            </div>
+            <p className="text-2xl font-bold text-[#0481FF] mt-1">{stats.totalStudentsEnrolled}</p>
+          </div>
+          
+          <div className="bg-green-50 rounded-xl p-4">
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-[#49c57a]" />
+              <span className="text-sm font-medium text-[#003C64]">Paid Schools</span>
+            </div>
+            <p className="text-2xl font-bold text-[#49c57a] mt-1">{stats.paidSchools}</p>
+          </div>
+          
+          <div className="bg-yellow-50 rounded-xl p-4">
+            <div className="flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-[#FFD600]" />
+              <span className="text-sm font-medium text-[#003C64]">Unpaid Schools</span>
+            </div>
+            <p className="text-2xl font-bold text-[#FFD600] mt-1">{stats.unpaidSchools}</p>
+          </div>
+          
+          <div className="bg-green-50 rounded-xl p-4">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-[#49c57a]" />
+              <span className="text-sm font-medium text-[#003C64]">Active Schools</span>
+            </div>
+            <p className="text-2xl font-bold text-[#49c57a] mt-1">{stats.activeSchools}</p>
+          </div>
+          
+          <div className="bg-red-50 rounded-xl p-4">
+            <div className="flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-[#f55a5a]" />
+              <span className="text-sm font-medium text-[#003C64]">Inactive Schools</span>
+            </div>
+            <p className="text-2xl font-bold text-[#f55a5a] mt-1">{stats.inactiveSchools}</p>
           </div>
         </div>
       </div>

@@ -12,7 +12,10 @@ import {
   ChevronRight,
   Search,
   Filter,
-  DollarSign
+  DollarSign,
+  Hash,
+  Info,
+  X
 } from 'lucide-react';
 import { SchoolData } from '../../types/school';
 import { SchoolStatusBadge } from './SchoolStatusBadge';
@@ -29,6 +32,120 @@ interface SchoolTableProps {
 
 type SortField = 'name' | 'country' | 'course' | 'totalStudents' | 'totalStudentsExpected' | 'lockedDealAmount' | 'status' | 'enrollmentDate';
 type SortDirection = 'asc' | 'desc';
+
+// Utility function to generate school ID
+const generateSchoolId = (school: SchoolData, index: number): string => {
+  const serialNumber = (index + 1).toString().padStart(3, '0');
+  const country = school.country || 'UNK';
+  const locationCode = getCountryAbbreviation(country);
+  return `SCH-${serialNumber}-${locationCode}`;
+};
+
+// Utility function to get country abbreviation
+const getCountryAbbreviation = (country: string): string => {
+  const countryMap: Record<string, string> = {
+    'Germany': 'GER',
+    'United Kingdom': 'UK',
+    'India': 'IND',
+    'United States': 'USA',
+    'Canada': 'CAN',
+    'Australia': 'AUS',
+    'France': 'FRA',
+    'Singapore': 'SGP',
+    'UAE': 'UAE'
+  };
+  return countryMap[country] || country.substring(0, 3).toUpperCase();
+};
+
+// Component for displaying grade-wise courses
+const GradeWiseCourses = ({ gradeAllocations }: { gradeAllocations?: any[] }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  
+  if (!gradeAllocations || gradeAllocations.length === 0) {
+    return <SchoolTag program="Not Assigned" />;
+  }
+
+  const assignedCourses = gradeAllocations
+    .filter(allocation => allocation.course && allocation.course !== 'Not Assigned' && allocation.course !== '')
+    .map(allocation => ({
+      grade: allocation.grade,
+      course: allocation.course
+    }));
+
+  if (assignedCourses.length === 0) {
+    return <SchoolTag program="Not Assigned" />;
+  }
+
+  const firstCourse = assignedCourses[0];
+  const remainingCount = assignedCourses.length - 1;
+
+  return (
+    <div className="flex items-center gap-2">
+      <SchoolTag program={firstCourse.course} />
+      {remainingCount > 0 && (
+        <div className="relative">
+          <span
+            className="inline-flex items-center gap-1 px-2 py-1 bg-[#E6F6FB] text-[#00AEEF] text-xs font-medium rounded-md border border-[#00AEEF] cursor-pointer hover:bg-[#D0F0FA] transition-colors"
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+            onClick={() => setShowInfoModal(true)}
+          >
+            +{remainingCount} More
+          </span>
+          
+          {/* Tooltip */}
+          {showTooltip && (
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-[#1E2A3B] text-white text-xs rounded-md opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-20 min-w-max">
+              {assignedCourses.slice(1).map((item, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <span className="text-[#00AEEF]">•</span>
+                  <span>Grade {item.grade} – {item.course}</span>
+                </div>
+              ))}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-[#1E2A3B]"></div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Info Modal for mobile or when tooltip doesn't work */}
+      {showInfoModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowInfoModal(false)}>
+          <div className="bg-white rounded-lg p-4 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-[#1E2A3B]">Grade-wise Courses</h3>
+              <button
+                onClick={() => setShowInfoModal(false)}
+                className="text-[#666] hover:text-[#1E2A3B]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {assignedCourses.map((item, index) => (
+                <div key={index} className="flex items-center gap-2 text-sm">
+                  <span className="text-[#00AEEF]">•</span>
+                  <span className="font-medium">Grade {item.grade}</span>
+                  <span className="text-[#666]">–</span>
+                  <span>{item.course}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// School ID Badge Component
+const SchoolIdBadge = ({ schoolId }: { schoolId: string }) => (
+  <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-[#E6F6FB] text-[#00AEEF] text-xs font-medium rounded-md border border-[#00AEEF]">
+    <Hash className="h-3 w-3" />
+    {schoolId}
+  </div>
+);
 
 export function SchoolTable({ 
   schools, 
@@ -183,6 +300,9 @@ export function SchoolTable({
                     <SortIcon field="country" />
                   </div>
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider">
+                  Contact Person
+                </th>
                 <th 
                   className="px-6 py-3 text-left text-xs font-medium text-[#1E2A3B] uppercase tracking-wider cursor-pointer hover:bg-[#D1F2F9] transition-colors"
                   onClick={() => handleSort('course')}
@@ -253,7 +373,8 @@ export function SchoolTable({
                         </div>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-[#1E2A3B]">
+                        <SchoolIdBadge schoolId={generateSchoolId(school, schools.indexOf(school))} />
+                        <div className="text-sm font-medium text-[#1E2A3B] mt-1">
                           {school.name}
                         </div>
                         <div className="text-sm text-[#666]">
@@ -272,7 +393,13 @@ export function SchoolTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <SchoolTag program={school.course || 'Not Assigned'} />
+                    <div className="text-sm text-[#1E2A3B]">
+                      <div className="font-medium">{school.principalName}</div>
+                      <div className="text-xs text-[#666]">{school.contactPersonRole}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <GradeWiseCourses gradeAllocations={school.gradeAllocations} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-[#1E2A3B]">
@@ -354,7 +481,8 @@ export function SchoolTable({
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-medium text-[#1E2A3B]">{school.name}</h3>
+                    <SchoolIdBadge schoolId={generateSchoolId(school, schools.indexOf(school))} />
+                    <h3 className="font-medium text-[#1E2A3B] mt-1">{school.name}</h3>
                     <p className="text-sm text-[#666]">{school.contactEmail}</p>
                     <p className="text-xs text-[#666]">{school.schoolCode}</p>
                   </div>
@@ -370,8 +498,15 @@ export function SchoolTable({
                   </span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-[#666]">Contact Person:</span>
+                  <div className="text-right">
+                    <div className="font-medium text-[#1E2A3B]">{school.principalName}</div>
+                    <div className="text-xs text-[#666]">{school.contactPersonRole}</div>
+                  </div>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-[#666]">Program:</span>
-                  <SchoolTag program={school.course || 'Not Assigned'} />
+                  <GradeWiseCourses gradeAllocations={school.gradeAllocations} />
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#666]">Expected Students:</span>

@@ -27,6 +27,8 @@ export interface PaymentVerification {
   dateCreated: string;
   dateUpdated: string;
   assignedCourse?: boolean;
+  currency?: string; // Currency code (INR, USD, AED, ZAR)
+  paymentMethod?: 'razorpay' | 'manual' | 'bank_transfer' | 'cash'; // Payment method
 }
 
 export interface PaymentVerificationForm {
@@ -65,6 +67,15 @@ export interface Student {
   campaignId?: string;
   sellingPrice?: number;
   convertedFromLead?: string; // Lead ID that was converted
+  // Group class fields
+  groupId?: string; // Unique group identifier
+  groupMemberIndex?: number; // Position in the group (1, 2, 3, etc.)
+  // Pricing fields
+  packagePrice?: number;
+  basePrice?: number;
+  discountPercent?: number;
+  currency?: string;
+  currencySymbol?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -96,6 +107,12 @@ export interface CreateStudentData {
   sellingPrice?: number;
   status?: 'active' | 'completed' | 'dropped';
   paymentStatus?: 'paid' | 'unpaid' | 'pending';
+  // Pricing fields
+  packagePrice?: number;
+  basePrice?: number;
+  discountPercent?: number;
+  currency?: string;
+  currencySymbol?: string;
 }
 
 // Lead types
@@ -113,6 +130,15 @@ export interface Lead {
   // New fields for enhanced CRM
   sellingPrice?: number;
   convertedToStudent?: string; // Student ID if converted
+  // Demo assignment fields
+  demoDate?: string;
+  demoInstructor?: string;
+  demoNotes?: string;
+  demoStatus?: 'scheduled' | 'completed' | 'cancelled';
+  // Admin validation fields
+  adminValidation?: 'pending' | 'eligible' | 'not_eligible';
+  adminValidationDate?: string;
+  adminValidationNotes?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -174,14 +200,20 @@ export interface ImportCampaign {
 export interface RevenueRecord {
   id: string;
   date: string;
-  name: string;
+  // Updated fields for B2B/B2C display
+  userType: 'B2B' | 'B2C'; // B2B for schools, B2C for students
+  userId: string; // School ID or Student ID
+  userName: string; // School name or Student name
   program: string;
   amountCollected: number;
-  razorpayReferenceId: string;
-  partnerId: string;
+  razorpayReferenceId?: string; // Optional - only for Razorpay payments
+  paymentMethod: 'razorpay' | 'manual'; // Payment method
   paymentStatus: 'paid' | 'expired' | 'pending';
-  convertedBy?: string;
+  // Removed fields: partnerId, convertedBy
   leadType: 'School' | 'Student';
+  // Currency support
+  currency?: string;
+  currencySymbol?: string;
 }
 
 export interface RevenueFilters {
@@ -230,4 +262,30 @@ export interface PayoutFilters {
   };
   status: string;
   showRazorpayOnly: boolean;
+}
+
+// Group class types
+export interface GroupStudentData {
+  fullName: string;
+  age: number;
+  grade: string;
+  phoneNumber: string;
+}
+
+export interface GroupEnrollmentData {
+  groupId: string;
+  program: string;
+  totalMembers: number;
+  groupEnrollmentDate: string;
+  students: GroupStudentData[];
+  leadType: string;
+  status: 'active' | 'completed' | 'dropped';
+  paymentStatus: 'paid' | 'unpaid' | 'pending';
+  notes?: string;
+  // Pricing fields
+  packagePrice?: number;
+  basePrice?: number;
+  discountPercent?: number;
+  currency?: string;
+  currencySymbol?: string;
 }

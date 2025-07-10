@@ -26,42 +26,69 @@ const columns: Column[] = [
     }
   },
   {
-    key: 'name',
-    label: 'Name',
-    sortable: true
+    key: 'userType',
+    label: 'User',
+    sortable: true,
+    render: (value: string, record: RevenueRecord) => (
+      <div className="space-y-1">
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+            value === 'B2B' 
+              ? 'bg-blue-100 text-blue-800' 
+              : 'bg-gray-100 text-gray-800'
+          }`}>
+            {value}
+          </span>
+          <span className="text-sm font-mono text-[#1E2A3B]">
+            {record.userId}
+          </span>
+        </div>
+        <div className="text-xs text-[#666] truncate max-w-48">
+          {record.userName}
+        </div>
+      </div>
+    )
   },
   {
     key: 'program',
-    label: 'Program',
+    label: 'Assigned Program',
     sortable: true
   },
   {
     key: 'amountCollected',
-    label: 'Amount Collected (₹)',
+    label: 'Amount Collected',
     sortable: true,
-    render: (value: number) => `₹${value.toLocaleString('en-IN')}`
+    render: (value: number, record: RevenueRecord) => {
+      const symbol = record.currencySymbol || '₹';
+      return `${symbol}${value.toLocaleString('en-IN')}`;
+    }
   },
   {
-    key: 'razorpayReferenceId',
-    label: 'Razorpay Reference ID',
-    sortable: true
-  },
-  {
-    key: 'partnerId',
-    label: 'Partner ID',
-    sortable: true
+    key: 'paymentMethod',
+    label: 'Payment Method',
+    sortable: true,
+    render: (value: string, record: RevenueRecord) => (
+      <div className="space-y-1">
+        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+          value === 'razorpay' 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-orange-100 text-orange-800'
+        }`}>
+          {value === 'razorpay' ? 'Razorpay' : 'Manual'}
+        </span>
+        {record.razorpayReferenceId && (
+          <div className="text-xs text-[#666] font-mono">
+            {record.razorpayReferenceId}
+          </div>
+        )}
+      </div>
+    )
   },
   {
     key: 'paymentStatus',
     label: 'Payment Status',
     sortable: true,
     render: (value: string) => <StatusBadge status={value as any} />
-  },
-  {
-    key: 'convertedBy',
-    label: 'Converted By',
-    sortable: true,
-    render: (value: string) => value || '-'
   }
 ];
 
@@ -195,34 +222,49 @@ export function RevenueTable({ data, onRowClick }: RevenueTableProps) {
                     <StatusBadge status={record.paymentStatus} />
                   </div>
                   <span className="text-lg font-semibold text-[#00AEEF]">
-                    ₹{record.amountCollected.toLocaleString('en-IN')}
+                    {record.currencySymbol || '₹'}{record.amountCollected.toLocaleString('en-IN')}
                   </span>
                 </div>
-                
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-[#666]">Name:</span>
-                    <span className="font-medium text-[#1E2A3B]">{record.name}</span>
+
+                {/* User Information */}
+                <div className="mb-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      record.userType === 'B2B' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {record.userType}
+                    </span>
+                    <span className="text-sm font-mono text-[#1E2A3B]">
+                      {record.userId}
+                    </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#666]">Program:</span>
-                    <span className="font-medium text-[#1E2A3B]">{record.program}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#666]">Reference ID:</span>
-                    <span className="font-mono text-xs text-[#666]">{record.razorpayReferenceId}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#666]">Partner ID:</span>
-                    <span className="font-medium text-[#1E2A3B]">{record.partnerId}</span>
-                  </div>
-                  {record.convertedBy && (
-                    <div className="flex justify-between">
-                      <span className="text-[#666]">Converted By:</span>
-                      <span className="font-medium text-[#1E2A3B]">{record.convertedBy}</span>
-                    </div>
-                  )}
+                  <p className="text-sm text-[#666]">
+                    {record.userName}
+                  </p>
                 </div>
+
+                {/* Program and Payment Method */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-[#1E2A3B] font-medium">
+                    {record.program}
+                  </span>
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                    record.paymentMethod === 'razorpay' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-orange-100 text-orange-800'
+                  }`}>
+                    {record.paymentMethod === 'razorpay' ? 'Razorpay' : 'Manual'}
+                  </span>
+                </div>
+
+                {/* Razorpay Reference ID (if exists) */}
+                {record.razorpayReferenceId && (
+                  <div className="mt-2 text-xs text-[#666] font-mono">
+                    {record.razorpayReferenceId}
+                  </div>
+                )}
               </div>
             ))}
           </div>

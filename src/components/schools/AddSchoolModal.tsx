@@ -56,6 +56,7 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
   const [formData, setFormData] = useState<Partial<SchoolData>>({
     name: school?.name || '',
     principalName: school?.principalName || '',
+    contactPersonRole: school?.contactPersonRole || '',
     contactNumber: school?.contactNumber || '',
     contactEmail: school?.contactEmail || '',
     country: school?.country || '',
@@ -81,6 +82,10 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
       newErrors.principalName = 'Contact person name is required';
     }
 
+    if (!formData.contactPersonRole?.trim()) {
+      newErrors.contactPersonRole = 'Role is required';
+    }
+
     if (!formData.contactNumber?.trim()) {
       newErrors.contactNumber = 'Contact number is required';
     }
@@ -97,10 +102,6 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
 
     if (!formData.city?.trim()) {
       newErrors.city = 'City is required';
-    }
-
-    if (!formData.course?.trim()) {
-      newErrors.course = 'Program assignment is required';
     }
 
     if (!formData.totalStudentsExpected || formData.totalStudentsExpected < 1) {
@@ -154,6 +155,7 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
     setFormData({
       name: '',
       principalName: '',
+      contactPersonRole: '',
       contactNumber: '',
       contactEmail: '',
       country: '',
@@ -263,6 +265,24 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
 
               <div>
                 <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                  Role *
+                </label>
+                <input
+                  type="text"
+                  value={formData.contactPersonRole}
+                  onChange={(e) => handleInputChange('contactPersonRole', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent ${
+                    errors.contactPersonRole ? 'border-[#f55a5a]' : 'border-[#E0E0E0]'
+                  }`}
+                  placeholder="Enter role (e.g. Principal, Coordinator)"
+                />
+                {errors.contactPersonRole && (
+                  <p className="text-sm text-[#f55a5a] mt-1">{errors.contactPersonRole}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
                   Contact Number *
                 </label>
                 <input
@@ -299,40 +319,7 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
             </div>
           </div>
 
-          {/* Section 2: Assigned Program */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Assigned Program
-            </h3>
-            
-            <div>
-              <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
-                Program Assigned *
-              </label>
-              <select
-                value={formData.course}
-                onChange={(e) => handleInputChange('course', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent ${
-                  errors.course ? 'border-[#f55a5a]' : 'border-[#E0E0E0]'
-                }`}
-              >
-                {programs.map(program => (
-                  <option key={program.value} value={program.value}>
-                    {program.label}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-[#666] mt-1">
-                Select the tech program assigned to this school
-              </p>
-              {errors.course && (
-                <p className="text-sm text-[#f55a5a] mt-1">{errors.course}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Section 3: Total Students */}
+          {/* Section 2: Total Students */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
               <Users className="h-4 w-4" />
@@ -360,7 +347,7 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
             </div>
           </div>
 
-          {/* Section 4: Grade & Section Allocation */}
+          {/* Section 3: Grade & Section Allocation */}
           {formData.totalStudentsExpected && formData.totalStudentsExpected > 0 && (
             <div className="space-y-4">
               <GradeAssignmentPanel
@@ -373,7 +360,7 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
             </div>
           )}
 
-          {/* Section 5: Revenue Deal */}
+          {/* Section 4: Revenue Deal */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
@@ -422,7 +409,7 @@ export function AddSchoolModal({ isOpen, onClose, onSubmit, school, isLoading = 
             </div>
           </div>
 
-          {/* Section 6: Additional Information */}
+          {/* Section 5: Additional Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
               <FileText className="h-4 w-4" />

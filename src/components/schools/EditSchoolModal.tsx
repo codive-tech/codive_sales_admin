@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Building, User, Phone, Mail, MapPin, BookOpen, FileText, Save, RotateCcw, DollarSign, Users } from 'lucide-react';
+import { X, Building, User, Phone, Mail, MapPin, FileText, Save, RotateCcw, DollarSign, Users } from 'lucide-react';
 import { SchoolData, GradeAllocation } from '../../types/school';
 import { InfoTooltip } from '../ui/Tooltip';
 import { GradeAssignmentPanel } from './GradeAssignmentPanel';
@@ -11,16 +11,6 @@ interface EditSchoolModalProps {
   school?: SchoolData;
   isLoading?: boolean;
 }
-
-const programs = [
-  { label: 'Select a program', value: '' },
-  { label: 'AI Bootcamp', value: 'AI Bootcamp' },
-  { label: 'Robotics 101', value: 'Robotics 101' },
-  { label: 'Coding Fundamentals', value: 'Coding Fundamentals' },
-  { label: 'Data Science', value: 'Data Science' },
-  { label: 'Web Development', value: 'Web Development' },
-  { label: 'Mobile App Development', value: 'Mobile App Development' }
-];
 
 const countries = [
   { label: 'Select a country', value: '' },
@@ -51,6 +41,7 @@ export function EditSchoolModal({ isOpen, onClose, onSubmit, school, isLoading =
   const [formData, setFormData] = useState<Partial<SchoolData>>({
     name: '',
     principalName: '',
+    contactPersonRole: '',
     contactNumber: '',
     contactEmail: '',
     country: '',
@@ -73,6 +64,7 @@ export function EditSchoolModal({ isOpen, onClose, onSubmit, school, isLoading =
       const initialData = {
         name: school.name || '',
         principalName: school.principalName || '',
+        contactPersonRole: school.contactPersonRole || '',
         contactNumber: school.contactNumber || '',
         contactEmail: school.contactEmail || '',
         country: school.country || '',
@@ -97,6 +89,7 @@ export function EditSchoolModal({ isOpen, onClose, onSubmit, school, isLoading =
       const hasFormChanges = 
         formData.name !== school.name ||
         formData.principalName !== school.principalName ||
+        formData.contactPersonRole !== school.contactPersonRole ||
         formData.contactNumber !== school.contactNumber ||
         formData.contactEmail !== school.contactEmail ||
         formData.country !== school.country ||
@@ -122,6 +115,10 @@ export function EditSchoolModal({ isOpen, onClose, onSubmit, school, isLoading =
 
     if (!formData.principalName?.trim()) {
       newErrors.principalName = 'Contact person name is required';
+    }
+
+    if (!formData.contactPersonRole?.trim()) {
+      newErrors.contactPersonRole = 'Role is required';
     }
 
     if (!formData.contactNumber?.trim()) {
@@ -198,6 +195,7 @@ export function EditSchoolModal({ isOpen, onClose, onSubmit, school, isLoading =
       const resetData = {
         name: school.name || '',
         principalName: school.principalName || '',
+        contactPersonRole: school.contactPersonRole || '',
         contactNumber: school.contactNumber || '',
         contactEmail: school.contactEmail || '',
         country: school.country || '',
@@ -309,6 +307,24 @@ export function EditSchoolModal({ isOpen, onClose, onSubmit, school, isLoading =
 
               <div>
                 <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                  Role *
+                </label>
+                <input
+                  type="text"
+                  value={formData.contactPersonRole}
+                  onChange={(e) => handleInputChange('contactPersonRole', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent ${
+                    errors.contactPersonRole ? 'border-[#f55a5a]' : 'border-[#E0E0E0]'
+                  }`}
+                  placeholder="Enter role (e.g. Principal, Coordinator)"
+                />
+                {errors.contactPersonRole && (
+                  <p className="text-sm text-[#f55a5a] mt-1">{errors.contactPersonRole}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
                   Contact Number *
                 </label>
                 <input
@@ -345,35 +361,7 @@ export function EditSchoolModal({ isOpen, onClose, onSubmit, school, isLoading =
             </div>
           </div>
 
-          {/* Section 2: Assigned Program */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Assigned Program
-            </h3>
-            
-            <div>
-              <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
-                Program Assigned
-              </label>
-              <select
-                value={formData.course}
-                onChange={(e) => handleInputChange('course', e.target.value)}
-                className="w-full px-3 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
-              >
-                {programs.map(program => (
-                  <option key={program.value} value={program.value}>
-                    {program.label}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-[#666] mt-1">
-                Select the tech program assigned to this school
-              </p>
-            </div>
-          </div>
-
-          {/* Section 3: Student Information */}
+          {/* Section 2: Student Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
               <Users className="h-4 w-4" />

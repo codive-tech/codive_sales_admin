@@ -85,6 +85,27 @@ export function SchoolTag({ program, className = '' }: SchoolTagProps) {
       icon: GraduationCap,
       description: 'Capstone-level real-world coding skills',
     },
+    'Starter pack': {
+      bgColor: 'bg-pink-100',
+      textColor: 'text-pink-800',
+      borderColor: 'border-pink-200',
+      icon: BookOpen,
+      description: 'Introduction to coding fundamentals',
+    },
+    'Hackathon preparation': {
+      bgColor: 'bg-violet-100',
+      textColor: 'text-violet-800',
+      borderColor: 'border-violet-200',
+      icon: Code,
+      description: 'Competitive coding and hackathon skills',
+    },
+    'Bootcamp adventure': {
+      bgColor: 'bg-cyan-100',
+      textColor: 'text-cyan-800',
+      borderColor: 'border-cyan-200',
+      icon: GraduationCap,
+      description: 'Intensive coding bootcamp experience',
+    },
     'Not Assigned': {
       bgColor: 'bg-gray-100',
       textColor: 'text-gray-800',

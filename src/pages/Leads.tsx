@@ -9,6 +9,8 @@ import { LeadNotesModal } from '../components/leads/LeadNotesModal';
 import { EditLeadModal } from '../components/leads/EditLeadModal';
 import { ConvertLeadModal } from '../components/leads/ConvertLeadModal';
 import { ImportLeadsModal } from '../components/leads/ImportLeadsModal';
+import { AssignDemoModal } from '../components/leads/AssignDemoModal';
+import { ValidateDemoModal } from '../components/leads/ValidateDemoModal';
 import Toast from '../components/ui/Toast';
 import { Plus, Upload, Users, TrendingUp } from 'lucide-react';
 
@@ -19,6 +21,8 @@ const Leads: React.FC = () => {
   const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
+  const [isAssignDemoModalOpen, setIsAssignDemoModalOpen] = useState(false);
+  const [isValidateDemoModalOpen, setIsValidateDemoModalOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [filters, setFilters] = useState<LeadFilters>({
     search: '',
@@ -166,12 +170,87 @@ const Leads: React.FC = () => {
     setIsConvertModalOpen(true);
   };
 
+  const handleAssignDemo = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsAssignDemoModalOpen(true);
+  };
+
+  const handleDemoAssignment = (demoData: {
+    demoDate: string;
+    demoInstructor: string;
+    demoNotes: string;
+  }) => {
+    if (!selectedLead) return;
+
+    const updatedLead: Lead = {
+      ...selectedLead,
+      demoDate: demoData.demoDate,
+      demoInstructor: demoData.demoInstructor,
+      demoNotes: demoData.demoNotes,
+      demoStatus: 'scheduled',
+      updatedAt: new Date().toISOString()
+    };
+
+    setLeads(prev => 
+      prev.map(lead => 
+        lead.id === selectedLead.id ? updatedLead : lead
+      )
+    );
+    
+    setIsAssignDemoModalOpen(false);
+    setSelectedLead(null);
+    showToast('Demo assigned successfully!', 'success');
+  };
+
+  const handleValidateDemo = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsValidateDemoModalOpen(true);
+  };
+
+  const handleDemoValidation = (validationData: {
+    adminValidation: 'eligible' | 'not_eligible';
+    adminValidationNotes: string;
+  }) => {
+    if (!selectedLead) return;
+
+    const updatedLead: Lead = {
+      ...selectedLead,
+      adminValidation: validationData.adminValidation,
+      adminValidationNotes: validationData.adminValidationNotes,
+      adminValidationDate: new Date().toISOString(),
+      status: validationData.adminValidation === 'eligible' ? 'Converted' : selectedLead.status,
+      updatedAt: new Date().toISOString()
+    };
+
+    setLeads(prev => 
+      prev.map(lead => 
+        lead.id === selectedLead.id ? updatedLead : lead
+      )
+    );
+    
+    setIsValidateDemoModalOpen(false);
+    setSelectedLead(null);
+    
+    if (validationData.adminValidation === 'eligible') {
+      showToast('Demo validated as eligible! Lead converted.', 'success');
+    } else {
+      showToast('Demo marked as not eligible.', 'info');
+    }
+  };
+
   const handleStudentConversion = (studentData: CreateStudentData) => {
+    if (!selectedLead) return;
+
+    // Generate student ID (format: STU-BLR-G7-xxxx)
+    const studentId = `STU-BLR-G7-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+    
     // In a real app, this would create a student and link it to the lead
-    // For now, we'll just show a success message
-    showToast('Lead successfully converted to student!', 'success');
+    // For now, we'll just show a success message and remove the lead
+    setLeads(prev => prev.filter(lead => lead.id !== selectedLead.id));
+    
     setIsConvertModalOpen(false);
     setSelectedLead(null);
+    showToast(`Student added successfully! Student ID: ${studentId}`, 'success');
   };
 
   const handleImportLeads = (importedLeads: CreateLeadData[]) => {
@@ -311,28 +390,23 @@ const Leads: React.FC = () => {
         {/* Conversion Funnel Chart */}
         <FunnelChart leads={filteredLeads} />
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Filters Panel */}
-          <div className="lg:col-span-1">
-            <LeadFiltersPanel
-              filters={filters}
-              onFiltersChange={setFilters}
-              onResetFilters={handleResetFilters}
-            />
-          </div>
+        {/* Filters Panel - Now above the table */}
+        <LeadFiltersPanel
+          filters={filters}
+          onFiltersChange={setFilters}
+          onResetFilters={handleResetFilters}
+        />
 
-          {/* Leads Table */}
-          <div className="lg:col-span-3">
-            <LeadsTable
-              leads={filteredLeads}
-              onStatusChange={handleStatusChange}
-              onEditLead={handleEditLead}
-              onViewNotes={handleViewNotes}
-              onConvertToStudent={handleConvertToStudent}
-            />
-          </div>
-        </div>
+        {/* Leads Table - Full width */}
+        <LeadsTable
+          leads={filteredLeads}
+          onStatusChange={handleStatusChange}
+          onEditLead={handleEditLead}
+          onViewNotes={handleViewNotes}
+          onConvertToStudent={handleConvertToStudent}
+          onAssignDemo={handleAssignDemo}
+          onValidateDemo={handleValidateDemo}
+        />
       </div>
 
       {/* Add Lead Modal */}
@@ -380,6 +454,28 @@ const Leads: React.FC = () => {
         }}
         lead={selectedLead}
         onAddNote={handleAddNote}
+      />
+
+      {/* Assign Demo Modal */}
+      <AssignDemoModal
+        isOpen={isAssignDemoModalOpen}
+        onClose={() => {
+          setIsAssignDemoModalOpen(false);
+          setSelectedLead(null);
+        }}
+        onSubmit={handleDemoAssignment}
+        lead={selectedLead}
+      />
+
+      {/* Validate Demo Modal */}
+      <ValidateDemoModal
+        isOpen={isValidateDemoModalOpen}
+        onClose={() => {
+          setIsValidateDemoModalOpen(false);
+          setSelectedLead(null);
+        }}
+        onSubmit={handleDemoValidation}
+        lead={selectedLead}
       />
 
       {/* Toast Notifications */}

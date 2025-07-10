@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Phone, Mail, GraduationCap, BookOpen, Building, FileText, Edit, RefreshCw, Hash } from 'lucide-react';
+import { X, User, Phone, Mail, GraduationCap, BookOpen, Building, FileText, Edit, RefreshCw, Hash, DollarSign, Percent } from 'lucide-react';
 import { Student, CreateStudentData } from '../../types';
 import { StudentStatusBadge, PaymentStatusBadge, EnrollmentTypeBadge } from './StudentStatusBadge';
 import { getProgramOptions, getProgramConfig } from '../../data/programConfig';
+import { 
+  getBasePrice, 
+  getCurrencyInfo, 
+  calculateFinalPrice, 
+  formatPrice, 
+  discountOptions 
+} from '../../data/pricingConfig';
 
 interface EditStudentModalProps {
   isOpen: boolean;
@@ -71,6 +78,16 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Pricing state
+  const [pricingData, setPricingData] = useState({
+    country: 'India', // Default country
+    basePrice: 0,
+    discountPercent: 0,
+    finalPrice: 0,
+    currency: 'INR',
+    currencySymbol: '₹'
+  });
+
   // Get selected program configuration
   const selectedProgramConfig = formData.program ? getProgramConfig(formData.program) : null;
 
@@ -88,10 +105,68 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
         leadType: student.leadType,
         status: student.status || 'active',
         paymentStatus: student.paymentStatus || 'unpaid',
-        notes: student.notes || ''
+        notes: student.notes || '',
+        // Pricing data
+        packagePrice: student.packagePrice,
+        basePrice: student.basePrice,
+        discountPercent: student.discountPercent,
+        currency: student.currency,
+        currencySymbol: student.currencySymbol
+      });
+
+      // Set pricing data
+      setPricingData({
+        country: 'India', // Default, could be enhanced to detect from student data
+        basePrice: student.basePrice || 0,
+        discountPercent: student.discountPercent || 0,
+        finalPrice: student.packagePrice || 0,
+        currency: student.currency || 'INR',
+        currencySymbol: student.currencySymbol || '₹'
       });
     }
   }, [student]);
+
+  // Calculate pricing when program, country, or enrollment type changes
+  useEffect(() => {
+    if (formData.program && formData.enrollmentType && pricingData.country) {
+      const basePrice = getBasePrice(pricingData.country, formData.program, formData.enrollmentType);
+      const currencyInfo = getCurrencyInfo(pricingData.country);
+      const finalPrice = calculateFinalPrice(basePrice, pricingData.discountPercent);
+      
+      setPricingData(prev => ({
+        ...prev,
+        basePrice,
+        finalPrice,
+        currency: currencyInfo?.currency || 'INR',
+        currencySymbol: currencyInfo?.symbol || '₹'
+      }));
+    }
+  }, [formData.program, formData.enrollmentType, pricingData.country, pricingData.discountPercent]);
+
+  // Handle pricing changes
+  const handlePricingChange = (field: string, value: string | number) => {
+    if (field === 'discountPercent' && typeof value === 'number') {
+      const finalPrice = calculateFinalPrice(pricingData.basePrice, value);
+      setPricingData(prev => ({
+        ...prev,
+        discountPercent: value,
+        finalPrice
+      }));
+    } else if (field === 'country' && typeof value === 'string' && formData.program) {
+      const basePrice = getBasePrice(value, formData.program, formData.enrollmentType);
+      const currencyInfo = getCurrencyInfo(value);
+      const finalPrice = calculateFinalPrice(basePrice, pricingData.discountPercent);
+      
+      setPricingData(prev => ({
+        ...prev,
+        country: value,
+        basePrice,
+        finalPrice,
+        currency: currencyInfo?.currency || 'INR',
+        currencySymbol: currencyInfo?.symbol || '₹'
+      }));
+    }
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -134,7 +209,16 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
     e.preventDefault();
     
     if (validateForm()) {
-      onSubmit(formData);
+      const updatedData: CreateStudentData = {
+        ...formData,
+        // Pricing data
+        packagePrice: pricingData.finalPrice,
+        basePrice: pricingData.basePrice,
+        discountPercent: pricingData.discountPercent,
+        currency: pricingData.currency,
+        currencySymbol: pricingData.currencySymbol
+      };
+      onSubmit(updatedData);
     }
   };
 
@@ -474,6 +558,118 @@ export function EditStudentModal({ isOpen, onClose, onSubmit, student, isLoading
               </div>
             </div>
           </div>
+
+          {/* Package Pricing Section */}
+          {formData.program && formData.enrollmentType && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-[#1E2A3B] flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Package Pricing
+              </h3>
+              
+              <div className="bg-[#E8F4FF] rounded-lg p-4 border border-[#00AEEF]">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Country Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                      Country *
+                    </label>
+                    <select
+                      value={pricingData.country}
+                      onChange={(e) => handlePricingChange('country', e.target.value)}
+                      className="w-full px-3 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+                    >
+                      <option value="India">India</option>
+                      <option value="United States">United States</option>
+                      <option value="United Arab Emirates">United Arab Emirates</option>
+                      <option value="South Africa">South Africa</option>
+                    </select>
+                  </div>
+
+                  {/* Currency Display */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                      Currency
+                    </label>
+                    <div className="px-3 py-2 bg-white border border-[#E0E0E0] rounded-lg text-sm font-medium text-[#003C64]">
+                      {pricingData.currency} {pricingData.currencySymbol}
+                    </div>
+                  </div>
+
+                  {/* Base Price Display */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                      Base Price
+                    </label>
+                    <div className="px-3 py-2 bg-white border border-[#E0E0E0] rounded-lg text-sm font-medium text-[#003C64]">
+                      {formatPrice(pricingData.basePrice, pricingData.currency, pricingData.currencySymbol)}
+                    </div>
+                  </div>
+
+                  {/* Discount Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#1E2A3B] mb-2">
+                      Discount
+                    </label>
+                    <div className="flex gap-2">
+                      <select
+                        value={pricingData.discountPercent}
+                        onChange={(e) => handlePricingChange('discountPercent', parseInt(e.target.value))}
+                        className="flex-1 px-3 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+                      >
+                        {discountOptions.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        min="0"
+                        max="50"
+                        value={pricingData.discountPercent}
+                        onChange={(e) => {
+                          const discount = parseInt(e.target.value) || 0;
+                          handlePricingChange('discountPercent', discount);
+                        }}
+                        className="w-20 px-2 py-2 border border-[#E0E0E0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent text-center"
+                        placeholder="%"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Final Price Display - Now Editable */}
+                <div className="mt-4 pt-4 border-t border-[#00AEEF]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-[#1E2A3B]">Final Package Price:</span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={pricingData.finalPrice}
+                        onChange={(e) => {
+                          const newPrice = parseFloat(e.target.value) || 0;
+                          setPricingData(prev => ({
+                            ...prev,
+                            finalPrice: newPrice
+                          }));
+                        }}
+                        className="text-lg font-bold text-[#00AEEF] bg-white px-4 py-2 rounded-lg border border-[#00AEEF] focus:outline-none focus:ring-2 focus:ring-[#00AEEF] w-32 text-right"
+                      />
+                      <span className="text-sm text-[#666]">{pricingData.currencySymbol}</span>
+                    </div>
+                  </div>
+                  {pricingData.discountPercent > 0 && (
+                    <p className="text-xs text-[#666] mt-1">
+                      {pricingData.discountPercent}% discount applied (Saved: {formatPrice(pricingData.basePrice - pricingData.finalPrice, pricingData.currency, pricingData.currencySymbol)})
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Additional Information */}
           <div className="space-y-4">

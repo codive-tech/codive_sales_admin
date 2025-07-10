@@ -21,7 +21,9 @@ export const mockPaymentVerifications: PaymentVerification[] = [
     paymentIdGenerated: generatePaymentId('412', 'S032'),
     dateCreated: '2024-01-15T10:30:00Z',
     dateUpdated: '2024-01-16T14:20:00Z',
-    assignedCourse: true
+    assignedCourse: true,
+    currency: 'INR',
+    paymentMethod: 'bank_transfer'
   },
   {
     id: '2',
@@ -37,7 +39,9 @@ export const mockPaymentVerifications: PaymentVerification[] = [
     paymentIdGenerated: generatePaymentId('415', 'S045'),
     dateCreated: '2024-01-20T09:15:00Z',
     dateUpdated: '2024-01-22T16:45:00Z',
-    assignedCourse: false
+    assignedCourse: false,
+    currency: 'INR',
+    paymentMethod: 'manual'
   },
   {
     id: '3',
@@ -52,7 +56,9 @@ export const mockPaymentVerifications: PaymentVerification[] = [
     paymentIdGenerated: generatePaymentId('418', 'S078'),
     dateCreated: '2024-01-25T11:00:00Z',
     dateUpdated: '2024-01-25T11:00:00Z',
-    assignedCourse: false
+    assignedCourse: false,
+    currency: 'INR',
+    paymentMethod: 'razorpay'
   },
   {
     id: '4',
@@ -67,7 +73,9 @@ export const mockPaymentVerifications: PaymentVerification[] = [
     paymentIdGenerated: generatePaymentId('420', 'S091'),
     dateCreated: '2024-01-28T13:45:00Z',
     dateUpdated: '2024-01-29T10:30:00Z',
-    assignedCourse: true
+    assignedCourse: true,
+    currency: 'INR',
+    paymentMethod: 'manual'
   },
   {
     id: '5',
@@ -83,7 +91,9 @@ export const mockPaymentVerifications: PaymentVerification[] = [
     paymentIdGenerated: generatePaymentId('422', 'S105'),
     dateCreated: '2024-01-30T08:20:00Z',
     dateUpdated: '2024-02-01T15:10:00Z',
-    assignedCourse: false
+    assignedCourse: false,
+    currency: 'INR',
+    paymentMethod: 'manual'
   },
   {
     id: '6',
@@ -95,10 +105,12 @@ export const mockPaymentVerifications: PaymentVerification[] = [
     courseTitle: 'Advanced Swimming Techniques',
     paymentNotes: 'Payment link expired. Need to regenerate.',
     isVerified: false,
-    paymentIdGenerated: generatePaymentId('425', 'S118'),
+    paymentIdGenerated: 'RZP-425-S118-1706887800',
     dateCreated: '2024-02-02T12:30:00Z',
     dateUpdated: '2024-02-02T12:30:00Z',
-    assignedCourse: false
+    assignedCourse: false,
+    currency: 'INR',
+    paymentMethod: 'razorpay'
   },
   {
     id: '7',
@@ -110,10 +122,12 @@ export const mockPaymentVerifications: PaymentVerification[] = [
     courseTitle: 'Competitive Swimming',
     paymentNotes: 'Full payment via credit card. Course access granted.',
     isVerified: true,
-    paymentIdGenerated: generatePaymentId('428', 'S132'),
+    paymentIdGenerated: 'RZP-428-S132-1707144900',
     dateCreated: '2024-02-05T14:15:00Z',
     dateUpdated: '2024-02-06T09:45:00Z',
-    assignedCourse: true
+    assignedCourse: true,
+    currency: 'INR',
+    paymentMethod: 'razorpay'
   },
   {
     id: '8',
@@ -129,7 +143,61 @@ export const mockPaymentVerifications: PaymentVerification[] = [
     paymentIdGenerated: generatePaymentId('430', 'S145'),
     dateCreated: '2024-02-08T10:00:00Z',
     dateUpdated: '2024-02-10T11:20:00Z',
-    assignedCourse: false
+    assignedCourse: false,
+    currency: 'INR',
+    paymentMethod: 'manual'
+  },
+  {
+    id: '9',
+    paymentId: 'pay_009',
+    schoolId: '432',
+    studentId: 'S158',
+    status: 'paid',
+    amount: 250,
+    courseTitle: 'Advanced Swimming Techniques',
+    paymentNotes: 'International student payment via Razorpay',
+    isVerified: true,
+    paymentIdGenerated: 'RZP-432-S158-1707235200',
+    dateCreated: '2024-02-07T09:00:00Z',
+    dateUpdated: '2024-02-07T09:30:00Z',
+    assignedCourse: true,
+    currency: 'USD',
+    paymentMethod: 'razorpay'
+  },
+  {
+    id: '10',
+    paymentId: 'pay_010',
+    schoolId: '435',
+    studentId: 'S171',
+    status: 'paid',
+    amount: 1200,
+    courseTitle: 'Water Safety & Rescue',
+    paymentNotes: 'UAE student payment completed',
+    isVerified: true,
+    paymentIdGenerated: 'RZP-435-S171-1707321600',
+    dateCreated: '2024-02-08T10:00:00Z',
+    dateUpdated: '2024-02-08T10:15:00Z',
+    assignedCourse: true,
+    currency: 'AED',
+    paymentMethod: 'razorpay'
+  },
+  {
+    id: '11',
+    paymentId: 'pay_011',
+    schoolId: '438',
+    studentId: 'S184',
+    status: 'partial',
+    amount: 5000,
+    partialAmount: 3000,
+    courseTitle: 'Competitive Swimming',
+    paymentNotes: 'South African student partial payment',
+    isVerified: false,
+    paymentIdGenerated: 'RZP-438-S184-1707408000',
+    dateCreated: '2024-02-09T11:00:00Z',
+    dateUpdated: '2024-02-09T11:45:00Z',
+    assignedCourse: false,
+    currency: 'ZAR',
+    paymentMethod: 'razorpay'
   }
 ];
 
