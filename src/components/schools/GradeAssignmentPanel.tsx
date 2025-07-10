@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Users, AlertTriangle } from 'lucide-react';
+import { Users, AlertTriangle, Plus, X } from 'lucide-react';
 import { GradeCard } from './GradeCard';
 import { RemainingCounter } from './RemainingCounter';
 import { SectionSelector } from './SectionSelector';
@@ -8,6 +8,15 @@ export interface GradeAllocation {
   grade: number;
   students: number;
   sections: string[];
+  course?: string;
+}
+
+// New interface for section-level allocations
+export interface SectionAllocation {
+  id: string;
+  grade: number;
+  students: number;
+  section: string;
   course?: string;
 }
 
@@ -40,62 +49,75 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
   totalStudentsExpected,
   onAllocationChange
 }) => {
-  const [allocations, setAllocations] = useState<GradeAllocation[]>([]);
+  // New state for section-level allocations
+  const [sectionAllocations, setSectionAllocations] = useState<SectionAllocation[]>([]);
   const [gradeErrors, setGradeErrors] = useState<Record<number, string>>({});
   const [touched, setTouched] = useState(false);
   const [expandedGrade, setExpandedGrade] = useState<number | null>(null);
   const [inputState, setInputState] = useState<{ 
     students: number; 
-    sections: string[]; 
+    section: string; 
     course: string;
     error: string | null 
   }>({ 
     students: 0, 
-    sections: [], 
+    section: '',
     course: '',
     error: null 
   });
 
   const grades = Array.from({ length: 10 }, (_, i) => i + 1);
 
+  // Calculate total assigned students
   const totalAssigned = useMemo(() => {
-    return allocations.reduce((sum, allocation) => sum + allocation.students, 0);
-  }, [allocations]);
+    return sectionAllocations.reduce((sum, allocation) => sum + allocation.students, 0);
+  }, [sectionAllocations]);
 
   const remainingStudents = totalStudentsExpected - totalAssigned;
   const hasExceeded = remainingStudents < 0;
 
-  // Recommended sections logic for each grade
-  const getRecommendedSections = (students: number) => {
-    if (students <= 0) return [];
-    const count = Math.max(1, Math.round(students / 25));
-    return ['A', 'B', 'C', 'D'].slice(0, count);
+  // Calculate remaining students per grade
+  const getRemainingForGrade = (grade: number) => {
+    const gradeAllocations = sectionAllocations.filter(a => a.grade === grade);
+    const gradeTotal = gradeAllocations.reduce((sum, a) => sum + a.students, 0);
+    return totalStudentsExpected - gradeTotal;
   };
 
-  // Handle update from each grade
-  const handleGradeUpdate = (grade: number, students: number, sections: string[], course?: string) => {
-    setTouched(true);
-    setAllocations(prev => {
-      const filtered = prev.filter(a => a.grade !== grade);
-      if (students > 0) {
-        return [...filtered, { grade, students, sections, course }].sort((a, b) => a.grade - b.grade);
+  // Convert section allocations to the old format for backward compatibility
+  const convertToGradeAllocations = (sectionAllocs: SectionAllocation[]): GradeAllocation[] => {
+    const gradeMap = new Map<number, GradeAllocation>();
+    
+    sectionAllocs.forEach(sectionAlloc => {
+      if (!gradeMap.has(sectionAlloc.grade)) {
+        gradeMap.set(sectionAlloc.grade, {
+          grade: sectionAlloc.grade,
+          students: 0,
+          sections: [],
+          course: sectionAlloc.course
+        });
       }
-      return filtered;
+      
+      const gradeAlloc = gradeMap.get(sectionAlloc.grade)!;
+      gradeAlloc.students += sectionAlloc.students;
+      if (!gradeAlloc.sections.includes(sectionAlloc.section)) {
+        gradeAlloc.sections.push(sectionAlloc.section);
+      }
     });
+    
+    return Array.from(gradeMap.values()).sort((a, b) => a.grade - b.grade);
   };
 
-  // When a grade card is expanded, load its state
+  // When a grade card is expanded, reset input state
   const handleExpand = (grade: number) => {
     if (expandedGrade === grade) {
       setExpandedGrade(null);
       return;
     }
     setExpandedGrade(grade);
-    const allocation = allocations.find(a => a.grade === grade);
     setInputState({
-      students: allocation?.students || 0,
-      sections: allocation?.sections || [],
-      course: allocation?.course || '',
+      students: 0,
+      section: '',
+      course: '',
       error: null
     });
   };
@@ -108,56 +130,103 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
       const num = Number(value);
       if (!isNaN(num)) students = num;
     }
-    // Validate
+    
+    // Validate against remaining quota for this grade
     let error = null;
-    const allocation = allocations.find(a => a.grade === expandedGrade);
-    const maxStudents = totalStudentsExpected - (totalAssigned - (allocation?.students || 0));
+    const remainingForGrade = getRemainingForGrade(expandedGrade!);
+    
     if (students < 0) {
       error = 'Value must be 0 or more';
-    } else if (students > maxStudents) {
-      error = "You've exceeded the total student limit";
+    } else if (students > remainingForGrade) {
+      error = `Cannot allocate more than ${remainingForGrade} students for Grade ${expandedGrade}`;
     }
+    
     setInputState(prev => ({ ...prev, students, error }));
   };
 
   const handleSectionChange = (sections: string[]) => {
-    setInputState(prev => ({ ...prev, sections }));
+    setInputState(prev => ({ ...prev, section: sections[0] || '' }));
   };
 
   const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setInputState(prev => ({ ...prev, course: e.target.value }));
   };
 
-  // Save expanded grade changes
+  // Save new section allocation
   const handleSave = () => {
-    if (expandedGrade == null) return;
-    handleGradeUpdate(
-      expandedGrade, 
-      inputState.students, 
-      inputState.sections.length > 0 ? inputState.sections : ['Single Class'],
-      inputState.course
-    );
-    setExpandedGrade(null);
+    if (expandedGrade == null || inputState.error) return;
+    
+    if (!inputState.section) {
+      setInputState(prev => ({ ...prev, error: 'Please select a section' }));
+      return;
+    }
+    
+    if (inputState.students <= 0) {
+      setInputState(prev => ({ ...prev, error: 'Please enter number of students' }));
+      return;
+    }
+    
+    const newAllocation: SectionAllocation = {
+      id: `${expandedGrade}-${inputState.section}-${Date.now()}`,
+      grade: expandedGrade,
+      students: inputState.students,
+      section: inputState.section,
+      course: inputState.course
+    };
+    
+    setSectionAllocations(prev => [...prev, newAllocation]);
+    setTouched(true);
+    
+    // Reset input state
+    setInputState({
+      students: 0,
+      section: '',
+      course: '',
+      error: null
+    });
   };
 
-  // Sync up to parent
-  React.useEffect(() => {
-    onAllocationChange(allocations);
-  }, [allocations, onAllocationChange]);
+  // Remove a section allocation
+  const handleRemoveAllocation = (allocationId: string) => {
+    setSectionAllocations(prev => prev.filter(a => a.id !== allocationId));
+    setTouched(true);
+  };
 
-  // Validate on submit (parent will call this, but we can show errors live)
+  // Sync up to parent with converted format
+  React.useEffect(() => {
+    const gradeAllocations = convertToGradeAllocations(sectionAllocations);
+    onAllocationChange(gradeAllocations);
+  }, [sectionAllocations, onAllocationChange]);
+
+  // Validate on submit
   React.useEffect(() => {
     if (!touched) return;
     const errors: Record<number, string> = {};
-    let runningTotal = 0;
-    allocations.forEach(a => {
-      runningTotal += a.students;
-      if (a.students > totalStudentsExpected) {
-        errors[a.grade] = 'Exceeds available students';
+    
+    // Check if any grade exceeds total
+    const gradeTotals = new Map<number, number>();
+    sectionAllocations.forEach(a => {
+      gradeTotals.set(a.grade, (gradeTotals.get(a.grade) || 0) + a.students);
+    });
+    
+    gradeTotals.forEach((total, grade) => {
+      if (total > totalStudentsExpected) {
+        errors[grade] = 'Exceeds available students';
       }
     });
+    
     setGradeErrors(errors);
-  }, [allocations, totalStudentsExpected, touched]);
+  }, [sectionAllocations, totalStudentsExpected, touched]);
+
+  // Get allocations for a specific grade
+  const getGradeAllocations = (grade: number) => {
+    return sectionAllocations.filter(a => a.grade === grade);
+  };
+
+  // Get total students for a grade
+  const getGradeTotal = (grade: number) => {
+    return getGradeAllocations(grade).reduce((sum, a) => sum + a.students, 0);
+  };
 
   return (
     <div className="space-y-4">
@@ -187,12 +256,16 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
       {/* Grade Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {grades.map(grade => {
-          const allocation = allocations.find(a => a.grade === grade);
+          const gradeTotal = getGradeTotal(grade);
+          const gradeAllocations = getGradeAllocations(grade);
           return (
             <GradeCard
               key={grade}
               grade={grade}
-              allocation={allocation}
+              allocation={gradeTotal > 0 ? {
+                students: gradeTotal,
+                sections: gradeAllocations.map(a => a.section)
+              } : undefined}
               expanded={expandedGrade === grade}
               onExpand={handleExpand}
             />
@@ -205,10 +278,11 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
         <div className="mt-4 space-y-4 bg-[#D0F0FA] p-4 rounded-md shadow">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-medium text-[#1E2A3B]">Grade {expandedGrade}</span>
-            <span className="text-xs text-[#00AEEF]">Section & Student Allocation</span>
+            <span className="text-xs text-[#00AEEF]">Add Section Allocation</span>
           </div>
-          {/* Add a drop down to select the courses*/}
-          <div className="flex items-center gap-2">
+          
+          {/* Course Selection */}
+          <div>
             <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Course</label>
             <select 
               value={inputState.course}
@@ -222,59 +296,50 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
               ))}
             </select>
           </div>
-          {/* Number of Students */}
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Number of Students */}
             <div>
               <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Number of Students <span className="text-[#f55a5a]">*</span></label>
               <div className="relative">
                 <input
                   type="number"
                   min={0}
-                  max={totalStudentsExpected}
                   value={inputState.students === 0 ? '' : inputState.students}
                   onChange={handleStudentsChange}
-                  placeholder={`Enter number of students for Grade ${expandedGrade}`}
+                  placeholder={`Enter number of students`}
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-[#00AEEF] hover:shadow transition-all h-11 ${inputState.error ? 'border-[#f55a5a]' : 'border-[#E0E0E0]'}`}
                   autoComplete="off"
                   inputMode="numeric"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-[#666]">Max: {totalStudentsExpected - (allocations.find(a => a.grade === expandedGrade)?.students || 0) + (inputState.students || 0)}</div>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-[#666]">
+                  Remaining: {getRemainingForGrade(expandedGrade)}
+                </div>
               </div>
               {inputState.error && <p className="text-xs text-[#f55a5a] mt-1">{inputState.error}</p>}
             </div>
-            {/* Section Selector */}
+            
+            {/* Section Selection */}
             <div>
-              <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Sections</label>
+              <label className="block text-sm font-medium text-[#1E2A3B] mb-2">Section <span className="text-[#f55a5a]">*</span></label>
               <SectionSelector
-                selectedSections={inputState.sections}
+                selectedSections={inputState.section ? [inputState.section] : []}
                 onSectionChange={handleSectionChange}
                 studentCount={inputState.students}
-                recommendedSections={getRecommendedSections(inputState.students)}
+                recommendedSections={[]} // Disable recommendations
               />
             </div>
           </div>
-          {/* Recommendation */}
-          {inputState.students > 0 && (
-            <div className="text-xs text-[#00AEEF] font-medium mt-2">
-              {(() => {
-                const count = Math.max(1, Math.round(inputState.students / 25));
-                return `Based on ${inputState.students} students, ${count} section${count > 1 ? 's' : ''} recommended (${Math.ceil(inputState.students / count)} each)`;
-              })()}
-            </div>
-          )}
-          {/* Placeholder if no section selected */}
-          {inputState.students > 0 && (!inputState.sections || inputState.sections.length === 0) && (
-            <div className="text-xs text-[#666] italic mt-1">No section selected (Single Class)</div>
-          )}
+          
           <div className="flex gap-2 mt-4">
             <button
               type="button"
-              className="bg-[#00AEEF] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#0095D9] transition-all"
+              className="bg-[#00AEEF] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#0095D9] transition-all flex items-center gap-2"
               onClick={handleSave}
-              disabled={!!inputState.error}
+              disabled={!!inputState.error || inputState.students <= 0 || !inputState.section}
             >
-              Save
+              <Plus className="h-4 w-4" />
+              Add Section
             </button>
             <button
               type="button"
@@ -287,24 +352,65 @@ export const GradeAssignmentPanel: React.FC<GradeAssignmentPanelProps> = ({
         </div>
       )}
 
-      {/* Summary */}
-      {allocations.length > 0 && (
-        <div className="bg-[#E6F6FB] rounded-lg p-4 mt-2">
-          <h4 className="font-medium text-[#1E2A3B] mb-2">Allocation Summary</h4>
-          <div className="space-y-1 text-sm text-[#666]">
-            {allocations.map(allocation => (
-              <div key={allocation.grade} className="flex justify-between">
-                <span>Grade {allocation.grade}:</span>
-                <span className="font-medium">
-                  {allocation.students} students
-                  {allocation.sections.length > 0 && (
-                    <span className="ml-2 text-[#00AEEF]">
-                      (Sections: {allocation.sections.join(', ')})
+      {/* Current Allocations for Expanded Grade */}
+      {expandedGrade !== null && getGradeAllocations(expandedGrade).length > 0 && (
+        <div className="bg-[#E6F6FB] rounded-lg p-4">
+          <h4 className="font-medium text-[#1E2A3B] mb-3">Current Allocations for Grade {expandedGrade}</h4>
+          <div className="space-y-2">
+            {getGradeAllocations(expandedGrade).map(allocation => (
+              <div key={allocation.id} className="flex items-center justify-between bg-white p-3 rounded-lg border">
+                <div className="flex items-center gap-3">
+                  <span className="font-medium text-[#1E2A3B]">
+                    Section {allocation.section}
+                  </span>
+                  <span className="text-sm text-[#666]">
+                    {allocation.students} students
+                  </span>
+                  {allocation.course && (
+                    <span className="text-xs bg-[#00AEEF] text-white px-2 py-1 rounded">
+                      {allocation.course}
                     </span>
                   )}
-                </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveAllocation(allocation.id)}
+                  className="text-[#f55a5a] hover:text-[#d32f2f] p-1"
+                  title="Remove allocation"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Summary */}
+      {sectionAllocations.length > 0 && (
+        <div className="bg-[#E6F6FB] rounded-lg p-4 mt-2">
+          <h4 className="font-medium text-[#1E2A3B] mb-2">Allocation Summary</h4>
+          <div className="space-y-2 text-sm text-[#666]">
+            {Array.from(new Set(sectionAllocations.map(a => a.grade))).sort().map(grade => {
+              const gradeAllocs = getGradeAllocations(grade);
+              const gradeTotal = getGradeTotal(grade);
+              return (
+                <div key={grade}>
+                  <div className="flex justify-between font-medium text-[#1E2A3B] mb-1">
+                    <span>Grade {grade}:</span>
+                    <span>{gradeTotal} students total</span>
+                  </div>
+                  <div className="ml-4 space-y-1">
+                    {gradeAllocs.map(allocation => (
+                      <div key={allocation.id} className="flex justify-between text-xs">
+                        <span>Section {allocation.section}:</span>
+                        <span>{allocation.students} students</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
